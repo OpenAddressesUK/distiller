@@ -15,12 +15,15 @@ describe Distiller::Import do
     Distiller::Import.postcodes
 
     expect(Postcode.all.count).to eq(50)
-    expect(Postcode.first.postcode).to eq("AB1 0AA")
-    expect(Postcode.first.area).to eq("AB")
-    expect(Postcode.first.outcode).to eq("AB1")
-    expect(Postcode.first.incode).to eq("0AA")
-    expect(Postcode.first.easting).to eq(385386)
-    expect(Postcode.first.northing).to eq(801193)
+
+    postcode = Postcode.where(postcode: "AB1 0AA").first
+
+    expect(postcode.postcode).to eq("AB1 0AA")
+    expect(postcode.area).to eq("AB")
+    expect(postcode.outcode).to eq("AB1")
+    expect(postcode.incode).to eq("0AA")
+    expect(postcode.easting).to eq(385386)
+    expect(postcode.northing).to eq(801193)
   end
 
 end

@@ -30,7 +30,7 @@ module Distiller
         CSV.parse(entry.get_input_stream.read, headers: true) do |row|
           pc = UKPostcode.new(row['pcd'])
           Postcode.create(
-                          postcode: row['pcd'],
+                          postcode: pc.norm,
                           area: pc.area,
                           outcode: pc.outcode,
                           incode: pc.incode,
