@@ -27,6 +27,8 @@ describe Distiller::Import do
     expect(postcode.introduced).to eq(Date.parse("1980-01-01"))
     expect(postcode.terminated).to eq(Date.parse("1996-06-01"))
     expect(postcode.authority).to eq("S12000033")
+    expect(postcode.location.y).to eq(801193.0)
+    expect(postcode.location.x).to eq(385386.0)
   end
 
   it "creates settlements" do
@@ -41,6 +43,8 @@ describe Distiller::Import do
 
     expect(settlement.name).to eq("Woughton")
     expect(settlement.authority).to eq("E06000042")
+    expect(settlement.location.y).to eq(238102.0)
+    expect(settlement.location.x).to eq(487056.0)
   end
 
 end

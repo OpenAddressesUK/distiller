@@ -1,6 +1,7 @@
 require_relative './concerns/tokenable'
 
 class Postcode < Tokenable
+  include Mongoid::Geospatial
 
   field :postcode, type: String
   field :area, type: String
@@ -12,4 +13,5 @@ class Postcode < Tokenable
   field :terminated, type: Date
   field :authority, type: String
 
+  geo_field :location
 end

@@ -1,5 +1,6 @@
 require 'mongoid'
 require 'mongoid_token'
+require 'mongoid_geospatial'
 
 $:.unshift File.dirname(__FILE__)
 

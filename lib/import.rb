@@ -7,7 +7,8 @@ module Distiller
       CSV.parse(ipn, headers: true) do |row|
         Settlement.create(
                           name: row['PLACE12NM'].chomp(")"),
-                          authority: get_authority(row)
+                          authority: get_authority(row),
+                          location: [row['GRIDGB1E'], row['GRIDGB1N']]
                          )
       end
 
@@ -56,7 +57,8 @@ module Distiller
                           northing: row['osnrth1m'],
                           introduced: parse_date(row['dointr']),
                           terminated: parse_date(row['doterm']),
-                          authority: row['oslaua']
+                          authority: row['oslaua'],
+                          location: [row['oseast1m'], row['osnrth1m']]
                          )
         end
       end
