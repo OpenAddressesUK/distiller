@@ -1,6 +1,6 @@
-class Postcode
-  include Mongoid::Document
-  include Mongoid::Timestamps
+require_relative './concerns/tokenable'
+
+class Postcode < Tokenable
 
   field :postcode, type: String
   field :area, type: String
@@ -11,5 +11,5 @@ class Postcode
   field :introduced, type: Date
   field :terminated, type: Date
   field :authority, type: String
-  
+
 end

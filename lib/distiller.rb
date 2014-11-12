@@ -1,4 +1,6 @@
 require 'mongoid'
+require 'mongoid_token'
+
 $:.unshift File.dirname(__FILE__)
 
 Mongoid.load!(File.join(File.dirname(__FILE__), "..", "config", "mongoid.yml"), ENV["MONGOID_ENVIRONMENT"] || :development)

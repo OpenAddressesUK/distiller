@@ -5,6 +5,7 @@ require 'vcr'
 require 'pry'
 require 'database_cleaner'
 require 'distiller'
+require 'factory_girl'
 
 VCR.configure do |c|
   c.cassette_library_dir = 'spec/cassettes'
@@ -15,6 +16,8 @@ end
 
 RSpec.configure do |config|
   config.order = "random"
+  config.include FactoryGirl::Syntax::Methods
+  FactoryGirl.find_definitions
 
   config.before(:suite) do
     DatabaseCleaner.strategy = :truncation
