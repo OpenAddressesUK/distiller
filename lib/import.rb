@@ -2,8 +2,26 @@ module Distiller
   class Import
 
     def self.settlements
+      ipn = HTTParty.get("https://github.com/OpenAddressesUK/IPN_2012/blob/master/IPN2012.csv?raw=true").parsed_response
 
+      CSV.parse(ipn, headers: true) do |row|
+        Settlement.create(
+                          name: row['PLACE12NM'].chomp(")"),
+                          authority: get_authority(row)
+                         )
+      end
 
+    end
+
+    def self.get_authority(row)
+      authority = [
+        row['NMD12CD'],
+        row['UA12CD'],
+        row['MD12CD'],
+        row['LONB12CD']
+      ].reject! { |a| a.blank? }
+
+      return authority.first if authority.count == 1
     end
 
     def self.towns

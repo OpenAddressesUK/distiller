@@ -10,6 +10,7 @@ require 'uk_postcode'
 
 require 'models/town'
 require 'models/postcode'
+require 'models/settlement'
 
 require 'import'
 

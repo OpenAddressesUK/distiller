@@ -29,4 +29,18 @@ describe Distiller::Import do
     expect(postcode.authority).to eq("S12000033")
   end
 
+  it "creates settlements" do
+    stub_request(:any, "https://github.com/OpenAddressesUK/IPN_2012/blob/master/IPN2012.csv?raw=true").
+      to_return(body: File.open(File.join(Dir.pwd, "spec", "fixtures", "IPN2012.csv")))
+
+    Distiller::Import.settlements
+
+    expect(Settlement.all.count).to eq(100)
+
+    settlement = Settlement.where(name: "Woughton").first
+
+    expect(settlement.name).to eq("Woughton")
+    expect(settlement.authority).to eq("E06000042")
+  end
+
 end
