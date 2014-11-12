@@ -11,6 +11,7 @@ require 'zip'
 require 'uk_postcode'
 
 require 'import'
+require 'distil'
 
 module Distiller
 end
