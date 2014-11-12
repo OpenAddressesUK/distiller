@@ -17,3 +17,4 @@ gem 'pry'
 gem 'rubyzip'
 gem 'uk_postcode'
 gem 'factory_girl'
+gem 'mongoid_address_models', github: "OpenAddressesUK/mongoid_address_models"
