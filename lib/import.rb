@@ -35,11 +35,20 @@ module Distiller
                           outcode: pc.outcode,
                           incode: pc.incode,
                           easting: row['oseast1m'],
-                          northing: row['osnrth1m']
+                          northing: row['osnrth1m'],
+                          introduced: parse_date(row['dointr']),
+                          terminated: parse_date(row['doterm']),
+                          authority: row['oslaua']
                          )
         end
       end
 
+    end
+
+    def self.parse_date(date, format = "%Y%m")
+      if !date.nil?
+        DateTime.strptime(date, "%Y%m")
+      end
     end
 
   end

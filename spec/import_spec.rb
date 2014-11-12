@@ -24,6 +24,9 @@ describe Distiller::Import do
     expect(postcode.incode).to eq("0AA")
     expect(postcode.easting).to eq(385386)
     expect(postcode.northing).to eq(801193)
+    expect(postcode.introduced).to eq(Date.parse("1980-01-01"))
+    expect(postcode.terminated).to eq(Date.parse("1996-06-01"))
+    expect(postcode.authority).to eq("S12000033")
   end
 
 end
