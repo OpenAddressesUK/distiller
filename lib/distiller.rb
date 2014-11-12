@@ -1,8 +1,7 @@
-require 'mongoid'
-require 'mongoid_token'
-require 'mongoid_geospatial'
+require 'bundler'
+Bundler.require
 
-$:.unshift File.dirname(__FILE__)
+require 'mongoid_address_models/require_all'
 
 Mongoid.load!(File.join(File.dirname(__FILE__), "..", "config", "mongoid.yml"), ENV["MONGOID_ENVIRONMENT"] || :development)
 
@@ -10,10 +9,6 @@ require 'httparty'
 require 'nokogiri'
 require 'zip'
 require 'uk_postcode'
-
-require 'models/town'
-require 'models/postcode'
-require 'models/settlement'
 
 require 'import'
 
