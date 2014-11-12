@@ -3,6 +3,7 @@ module Distiller
 
     def self.settlements
 
+
     end
 
     def self.towns
@@ -19,6 +20,25 @@ module Distiller
     end
 
     def self.postcodes
+      zip = Tempfile.new("postcodes.zip")
+      zip.binmode
+      zip.write HTTParty.get("https://geoportal.statistics.gov.uk/Docs/PostCodes/ONSPD_AUG_2014_csv.zip").parsed_response
+      zip.close
+
+      Zip::File.open(zip.path)do |zip_file|
+        entry = zip_file.glob('ONSPD_AUG_2014_csv/Data/*.csv').first
+        CSV.parse(entry.get_input_stream.read, headers: true) do |row|
+          pc = UKPostcode.new(row['pcd'])
+          Postcode.create(
+                          postcode: row['pcd'],
+                          area: pc.area,
+                          outcode: pc.outcode,
+                          incode: pc.incode,
+                          easting: row['oseast1m'],
+                          northing: row['osnrth1m']
+                         )
+        end
+      end
 
     end
 

@@ -1,5 +1,6 @@
 ENV["MONGOID_ENVIRONMENT"] = "test"
 
+require 'webmock/rspec'
 require 'vcr'
 require 'pry'
 require 'database_cleaner'

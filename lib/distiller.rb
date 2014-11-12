@@ -5,8 +5,11 @@ Mongoid.load!(File.join(File.dirname(__FILE__), "..", "config", "mongoid.yml"), 
 
 require 'httparty'
 require 'nokogiri'
+require 'zip'
+require 'uk_postcode'
 
 require 'models/town'
+require 'models/postcode'
 
 require 'import'
 
