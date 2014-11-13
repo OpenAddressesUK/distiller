@@ -47,4 +47,24 @@ describe Distiller::Import do
     expect(locality.location.x).to eq(487056.0)
   end
 
+  it "creates streets" do
+    ("a".."d").each do |letter|
+      stub_request(:any, "https://github.com/OpenAddressesUK/OS_Locator/blob/gh-pages/OS_Locator2014_2_OPEN_xa#{letter}.txt?raw=true").
+        to_return(body: File.open(File.join(Dir.pwd, "spec", "fixtures", "OS_Locator2014_2_OPEN_xa#{letter}.txt")))
+    end
+
+    Distiller::Import.streets
+
+    expect(Street.all.count).to eq(40)
+
+    street = Street.where(name: "BUCKINGHAM DRIVE").first
+
+    expect(street.name).to eq("BUCKINGHAM DRIVE")
+    expect(street.settlement).to eq("East Grinstead")
+    expect(street.locality).to eq("East Grinstead")
+    expect(street.authority).to eq("Mid Sussex District")
+    expect(street.location.x).to eq(540136.0)
+    expect(street.location.y).to eq(137546.0)
+  end
+
 end

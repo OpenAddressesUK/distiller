@@ -65,6 +65,22 @@ module Distiller
 
     end
 
+    def self.streets
+      ("a".."d").each do |letter|
+        locator = HTTParty.get("https://github.com/OpenAddressesUK/OS_Locator/blob/gh-pages/OS_Locator2014_2_OPEN_xa#{letter}.txt?raw=true").parsed_response
+
+        CSV.parse(locator, col_sep: ":") do |row|
+          Street.create(
+            name: row[0],
+            settlement: row[8],
+            locality: row[9],
+            authority:row[11],
+            location: [row[2], row[3]]
+          )
+        end
+      end
+    end
+
     def self.parse_date(date, format = "%Y%m")
       if !date.nil?
         DateTime.strptime(date, "%Y%m")

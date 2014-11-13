@@ -1,0 +1,10 @@
+BUCKINGHAM DRIVE::540136:137546:540091:540183:137487:137606:East Grinstead:East Grinstead:West Sussex County:Mid Sussex District:TQ43NW:TQ43:Roads
+DROVE ROAD::336465:584615:336366:336568:584389:584841:Langholm:Langholm and Upper Eskdale:Dumfries and Galloway:Dumfries and Galloway:NY38SE:NY38:Roads
+DROVERS WAY::530060:184802:530027:530104:184744:184867:Islington:Holloway:Greater London Authority:Islington London Borough:TQ38SW:TQ38:Roads
+MARKET PLACE::345935:751240:345887:345982:751223:751257:Forfar:Forfar Central:Angus:Angus:NO45SE:NO45:Roads
+HOLLAND STREET::434886:387267:434824:434952:387235:387286:Sheffield:Netherthorpe:Sheffield District (B):Sheffield District (B):SK38NW:SK38:Roads
+MARKET PLACE::397953:310220:397923:397981:310198:310246:Cannock:Cannock West:Staffordshire County:Cannock Chase District:SJ91SE:SJ91:Roads
+TANNERY CLOSE::532248:343619:532222:532261:343593:343642:Boston:Staniland South:Lincolnshire County:Boston District (B):TF34SW:TF34:Roads
+PENTIRE ROAD::412629:309080:412568:412801:308878:309135:Lichfield:Lichfield:Staffordshire County:Lichfield District:SK10NW:SK10:Roads
+RYALL MEADOW::386336:240529:386271:386415:240454:240569:Ryall:Ripple:Worcestershire County:Malvern Hills District:SO84SE:SO84:Roads
+THE GROVE::617525:214980:617507:617542:214838:215123:Clacton-on-Sea:St James:Essex County:Tendring District:TM11SE:TM11:Roads
