@@ -3,6 +3,9 @@ services:
   - mongodb
 rvm:
   - 2.1.3
+env:
+  global:
+    ERNEST_ADDRESS_ENDPOINT=http://ernest.dev
 notifications:
   irc:
     channels:
