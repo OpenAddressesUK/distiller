@@ -11,7 +11,11 @@ describe Distiller::Distil do
         "name" => "123"
       },
       "street" => {
-        "name" => "TEST ROAD"
+        "name" => "TEST ROAD",
+        "geometry" => {
+          "type" => "Point",
+          "coordinates" => [529721,180880]
+        }
       },
       "locality" => {
         "name" => "KINGS HEATH"
@@ -72,6 +76,47 @@ describe Distiller::Distil do
       Distiller::Distil.perform
 
       expect(Address.count).to eq 125
+    end
+
+  end
+
+  context "get street" do
+    it "Identifies streets successfully when there is a single candidate" do
+      street = Street.create(name: "TEST ROAD")
+
+      got_street = Distiller::Distil.get_street(@address)
+
+      expect(got_street).to eq(street)
+    end
+
+    it "Identifies streets successfully when street is ambiguous" do
+      Street.create(name: "TEST ROAD", location: [3333,12234])
+      street = Street.create(name: "TEST ROAD", location: [529721,180880])
+
+      got_street = Distiller::Distil.get_street(@address)
+
+      expect(got_street).to eq(street)
+    end
+
+    it "Creates a new street when no candidate is available" do
+      address = @address
+      address['street']['name'] = "FAKE STREET"
+      got_street = Distiller::Distil.get_street(@address)
+
+      expect(got_street.name).to eq("FAKE STREET")
+    end
+
+    it "returns a best guess if no geo data is available" do
+      5.times do
+        Street.create(name: "EVERGREEN TERRACE")
+      end
+      
+      address = @address
+      address['street']['name'] = "EVERGREEN TERRACE"
+      address['street']['geometry'] = nil
+
+      got_street = Distiller::Distil.get_street(@address)
+      expect(got_street.name).to eq("EVERGREEN TERRACE")
     end
 
   end

@@ -39,7 +39,20 @@ module Distiller
     end
 
     def self.get_street(address)
-      Street.where(name: address['street']['name']).first
+      street = Street.where(name: address['street']['name'])
+      if street.count == 1
+        street = street.first
+      elsif street.count == 0
+        street = Street.create(name: address['street']['name'])
+      elsif street.count > 1
+        location = address['street']['geometry'].nil? ? nil : address['street']['geometry']['coordinates']
+        if location.nil?
+          street = street.first # If we don't have a geometry, we'll have to return a best guess for now
+        else
+          street = Street.where(name: address['street']['name'], location: location).first
+        end
+      end
+      return street
     end
 
   end
