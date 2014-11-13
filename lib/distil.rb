@@ -31,7 +31,7 @@ module Distiller
 
     def self.get_postcode(address)
       postcode = UKPostcode.new(address['postcode'])
-      Postcode.where(postcode: postcode.norm).first
+      Postcode.where(name: postcode.norm).first
     end
 
   end

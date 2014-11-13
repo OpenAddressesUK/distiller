@@ -37,7 +37,7 @@ describe Distiller::Distil do
   end
 
   it "Identifies postcodes successfully" do
-    postcode = Postcode.create(postcode: "B1 2NN")
+    postcode = Postcode.create(name: "B1 2NN")
 
     address =  {
       "saon" => nil,

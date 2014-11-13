@@ -16,9 +16,9 @@ describe Distiller::Import do
 
     expect(Postcode.all.count).to eq(50)
 
-    postcode = Postcode.where(postcode: "AB1 0AA").first
+    postcode = Postcode.where(name: "AB1 0AA").first
 
-    expect(postcode.postcode).to eq("AB1 0AA")
+    expect(postcode.name).to eq("AB1 0AA")
     expect(postcode.area).to eq("AB")
     expect(postcode.outcode).to eq("AB1")
     expect(postcode.incode).to eq("0AA")
