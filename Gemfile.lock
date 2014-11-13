@@ -1,6 +1,6 @@
 GIT
   remote: git://github.com/OpenAddressesUK/mongoid_address_models.git
-  revision: 00d6be4a12deb479881edbf261c0ab68c175b4e1
+  revision: dbb14b6e9682d5e45a80a95b3aa963834727793e
   specs:
     mongoid_address_models (0.0.1)
       database_cleaner
