@@ -9,6 +9,9 @@ require 'httparty'
 require 'nokogiri'
 require 'zip'
 require 'uk_postcode'
+require 'dotenv'
+
+Dotenv.load
 
 require 'import'
 require 'distil'
