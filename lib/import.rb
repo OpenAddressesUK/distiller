@@ -1,7 +1,7 @@
 module Distiller
   class Import
 
-    def self.localitys
+    def self.localities
       ipn = HTTParty.get("https://github.com/OpenAddressesUK/IPN_2012/blob/master/IPN2012.csv?raw=true").parsed_response
 
       CSV.parse(ipn, headers: true) do |row|

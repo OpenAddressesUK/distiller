@@ -31,11 +31,11 @@ describe Distiller::Import do
     expect(postcode.location.x).to eq(385386.0)
   end
 
-  it "creates localitys" do
+  it "creates localities" do
     stub_request(:any, "https://github.com/OpenAddressesUK/IPN_2012/blob/master/IPN2012.csv?raw=true").
       to_return(body: File.open(File.join(Dir.pwd, "spec", "fixtures", "IPN2012.csv")))
 
-    Distiller::Import.localitys
+    Distiller::Import.localities
 
     expect(Locality.all.count).to eq(100)
 
