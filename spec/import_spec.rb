@@ -31,20 +31,20 @@ describe Distiller::Import do
     expect(postcode.location.x).to eq(385386.0)
   end
 
-  it "creates settlements" do
+  it "creates localitys" do
     stub_request(:any, "https://github.com/OpenAddressesUK/IPN_2012/blob/master/IPN2012.csv?raw=true").
       to_return(body: File.open(File.join(Dir.pwd, "spec", "fixtures", "IPN2012.csv")))
 
-    Distiller::Import.settlements
+    Distiller::Import.localitys
 
-    expect(Settlement.all.count).to eq(100)
+    expect(Locality.all.count).to eq(100)
 
-    settlement = Settlement.where(name: "Woughton").first
+    locality = Locality.where(name: "Woughton").first
 
-    expect(settlement.name).to eq("Woughton")
-    expect(settlement.authority).to eq("E06000042")
-    expect(settlement.location.y).to eq(238102.0)
-    expect(settlement.location.x).to eq(487056.0)
+    expect(locality.name).to eq("Woughton")
+    expect(locality.authority).to eq("E06000042")
+    expect(locality.location.y).to eq(238102.0)
+    expect(locality.location.x).to eq(487056.0)
   end
 
 end

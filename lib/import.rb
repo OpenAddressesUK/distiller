@@ -1,11 +1,11 @@
 module Distiller
   class Import
 
-    def self.settlements
+    def self.localitys
       ipn = HTTParty.get("https://github.com/OpenAddressesUK/IPN_2012/blob/master/IPN2012.csv?raw=true").parsed_response
 
       CSV.parse(ipn, headers: true) do |row|
-        Settlement.create(
+        Locality.create(
                           name: row['PLACE12NM'].chomp(")"),
                           authority: get_authority(row),
                           location: [row['GRIDGB1E'], row['GRIDGB1N']]

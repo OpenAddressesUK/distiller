@@ -22,7 +22,7 @@ module Distiller
     end
 
     def self.get_locality(address)
-      Settlement.where(name: address['locality']).first
+      Locality.where(name: address['locality']).first
     end
 
     def self.get_town(address)

@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Distiller::Distil do
 
   it "Identifies localities successfully" do
-    locality = Settlement.create(name: "KINGS HEATH")
+    locality = Locality.create(name: "KINGS HEATH")
 
     address =  {
       "saon" => nil,
