@@ -40,10 +40,9 @@ module Distiller
 
     def self.get_street(address)
       street = Street.where(name: address['street']['name'])
+
       if street.count == 1
         street = street.first
-      elsif street.count == 0
-        street = Street.create(name: address['street']['name'])
       elsif street.count > 1
         location = address['street']['geometry'].nil? ? nil : address['street']['geometry']['coordinates']
         if location.nil?
@@ -51,7 +50,10 @@ module Distiller
         else
           street = Street.where(name: address['street']['name'], location: location).first
         end
+      elsif street.count == 0
+        street = Street.create(name: address['street']['name']) # If there are no streets, create one
       end
+
       return street
     end
 
