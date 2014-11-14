@@ -8,10 +8,11 @@ module Distiller
       1.upto(pages) do |i|
         response = HTTParty.get("#{ENV['ERNEST_ADDRESS_ENDPOINT']}?page=#{i}").parsed_response
         response['addresses'].each do |address|
-          street = get_street(address)
-          locality = get_locality(address)
-          town = get_town(address)
           postcode = get_postcode(address)
+
+          street = get_street(address)
+          locality = get_locality(address, postcode)
+          town = get_town(address)
 
           Address.create(
             sao: address['saon']['name'],
@@ -25,8 +26,16 @@ module Distiller
       end
     end
 
-    def self.get_locality(address)
-      Locality.where(name: address['locality']['name']).first
+    def self.get_locality(address, postcode)
+      return nil if address['locality']['name'].nil?
+
+      locality = Locality.where(name: address['locality']['name'])
+
+      if locality.count > 1
+        locality = locality.geo_near(postcode.location.to_a)
+      end
+
+      return locality.first
     end
 
     def self.get_town(address)

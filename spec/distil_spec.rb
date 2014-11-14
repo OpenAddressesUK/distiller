@@ -139,8 +139,12 @@ describe Distiller::Distil do
     it "Identifies localities successfully when locality is ambiguous" do
       Locality.create(name: "KINGS HEATH", location: [54.435848, -1.562975])
       locality = Locality.create(name: "KINGS HEATH", location: [52.435848,-1.892975])
+      postcode = Postcode.create(
+                                  name: @address['postcode']['name'],
+                                  location: [52.437305,-1.892883]
+                                )
 
-      got_locality = Distiller::Distil.get_locality(@address, nil)
+      got_locality = Distiller::Distil.get_locality(@address, postcode)
 
       expect(got_locality).to eq(locality)
     end
