@@ -27,8 +27,8 @@ describe Distiller::Import do
     expect(postcode.introduced).to eq(Date.parse("1980-01-01"))
     expect(postcode.terminated).to eq(Date.parse("1996-06-01"))
     expect(postcode.authority).to eq("S12000033")
-    expect(postcode.location.y).to eq(-2.2428351220462)
-    expect(postcode.location.x).to eq(57.10147801540051)
+    expect(postcode.location.y.to_s).to match /\-2\.24283/
+    expect(postcode.location.x.to_s).to match /57\.10147/
   end
 
   it "creates localities" do
@@ -43,8 +43,8 @@ describe Distiller::Import do
 
     expect(locality.name).to eq("Woughton")
     expect(locality.authority).to eq("E06000042")
-    expect(locality.location.y).to eq(-0.7323301392044714)
-    expect(locality.location.x).to eq(52.03450197050588)
+    expect(locality.location.y.to_s).to match /\-0\.73233/
+    expect(locality.location.x.to_s).to match /52\.03450/
   end
 
   it "creates streets" do
@@ -63,8 +63,8 @@ describe Distiller::Import do
     expect(street.settlement).to eq("East Grinstead")
     expect(street.locality).to eq("East Grinstead")
     expect(street.authority).to eq("Mid Sussex District")
-    expect(street.location.x).to eq(51.1200696522193)
-    expect(street.location.y).to eq(0.0009394871498754043)
+    expect(street.location.x.to_s).to match /51.1200/
+    expect(street.location.y.to_s).to match /0\.0009/
   end
 
 end
