@@ -1,5 +1,5 @@
 require 'bundler'
-Bundler.require
+Bundler.require(:default)
 
 require 'mongoid_address_models/require_all'
 

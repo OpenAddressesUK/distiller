@@ -3,20 +3,23 @@ ruby '2.1.3'
 
 source 'https://rubygems.org'
 
-gem 'rspec'
+group :test do
+  gem 'rspec'
+  gem 'webmock'
+  gem 'vcr'
+  gem 'database_cleaner'
+  gem 'pry'
+  gem 'factory_girl'
+end
+
 gem 'httparty'
-gem 'webmock'
-gem 'vcr'
 gem 'mongoid'
 gem 'mongoid_token'
 gem 'mongoid_geospatial'
 gem 'rake'
 gem 'nokogiri'
-gem 'database_cleaner'
-gem 'pry'
 gem 'rubyzip'
 gem 'uk_postcode'
-gem 'factory_girl'
 gem 'mongoid_address_models', github: "OpenAddressesUK/mongoid_address_models"
 gem 'dotenv'
 gem 'breasal'
