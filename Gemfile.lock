@@ -1,6 +1,6 @@
 GIT
   remote: git://github.com/OpenAddressesUK/mongoid_address_models.git
-  revision: d8d860307729378d9da348ddd24b470c00e9988f
+  revision: 948fe8bbf516c4f907f84f147171044e1eab5659
   specs:
     mongoid_address_models (0.0.1)
       database_cleaner
@@ -42,6 +42,7 @@ GEM
       tzinfo (~> 1.1)
     addressable (2.3.6)
     arel (5.0.1.20140414130214)
+    breasal (0.0.1)
     bson (2.3.0)
     builder (3.2.2)
     coderay (1.1.0)
@@ -150,6 +151,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  breasal
   database_cleaner
   dotenv
   factory_girl

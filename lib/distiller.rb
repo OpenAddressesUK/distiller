@@ -13,8 +13,10 @@ require 'dotenv'
 
 Dotenv.load
 
+require 'helpers'
 require 'import'
 require 'distil'
+require 'indexes'
 
 module Distiller
 end

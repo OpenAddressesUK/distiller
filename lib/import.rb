@@ -1,14 +1,17 @@
 module Distiller
   class Import
 
+    extend Distiller::Helpers
+
     def self.localities
       ipn = HTTParty.get("https://github.com/OpenAddressesUK/IPN_2012/blob/master/IPN2012.csv?raw=true").parsed_response
 
       CSV.parse(ipn, headers: true) do |row|
+        ll = en_to_ll(row['GRIDGB1E'], row['GRIDGB1N'])
         Locality.create(
                           name: row['PLACE12NM'].chomp(")"),
                           authority: get_authority(row),
-                          location: [row['GRIDGB1E'], row['GRIDGB1N']]
+                          location: [ll[:lat], ll[:lng]]
                          )
       end
 
@@ -48,6 +51,7 @@ module Distiller
         entry = zip_file.glob('ONSPD_AUG_2014_csv/Data/*.csv').first
         CSV.parse(entry.get_input_stream.read, headers: true) do |row|
           pc = UKPostcode.new(row['pcd'])
+          ll = en_to_ll(row['oseast1m'], row['osnrth1m'])
           Postcode.create(
                           name: pc.norm,
                           area: pc.area,
@@ -58,7 +62,7 @@ module Distiller
                           introduced: parse_date(row['dointr']),
                           terminated: parse_date(row['doterm']),
                           authority: row['oslaua'],
-                          location: [row['oseast1m'], row['osnrth1m']]
+                          location: [ll[:lat], ll[:lng]]
                          )
         end
       end
@@ -70,12 +74,13 @@ module Distiller
         locator = HTTParty.get("https://github.com/OpenAddressesUK/OS_Locator/blob/gh-pages/OS_Locator2014_2_OPEN_xa#{letter}.txt?raw=true").parsed_response
 
         CSV.parse(locator, col_sep: ":") do |row|
+          ll = en_to_ll(row[2], row[3])
           Street.create(
             name: row[0],
             settlement: row[8],
             locality: row[9],
             authority:row[11],
-            location: [row[2], row[3]]
+            location: [ll[:lat], ll[:lng]]
           )
         end
       end

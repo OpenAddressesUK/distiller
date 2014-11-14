@@ -14,7 +14,7 @@ describe Distiller::Distil do
         "name" => "TEST ROAD",
         "geometry" => {
           "type" => "Point",
-          "coordinates" => [529721,180880]
+          "coordinates" => [52.480185,-1.912451]
         }
       },
       "locality" => {
@@ -24,7 +24,11 @@ describe Distiller::Distil do
         "name" => "BIRMINGHAM"
       },
       "postcode" => {
-        "name" => "B1 2NN"
+        "name" => "B1 2NN",
+        "geometry" => {
+          "type" => "Point",
+          "coordinates" => [52.480238,-1.911067]
+        }
       }
     }
 
@@ -90,8 +94,8 @@ describe Distiller::Distil do
     end
 
     it "Identifies streets successfully when street is ambiguous" do
-      Street.create(name: "TEST ROAD", location: [3333,12234])
-      street = Street.create(name: "TEST ROAD", location: [529721,180880])
+      Street.create(name: "TEST ROAD", location: [55.480185,-1.842451])
+      street = Street.create(name: "TEST ROAD", location: [52.480185,-1.912451])
 
       got_street = Distiller::Distil.get_street(@address)
 
@@ -110,7 +114,7 @@ describe Distiller::Distil do
       5.times do
         Street.create(name: "EVERGREEN TERRACE")
       end
-      
+
       address = @address
       address['street']['name'] = "EVERGREEN TERRACE"
       address['street']['geometry'] = nil
@@ -121,12 +125,26 @@ describe Distiller::Distil do
 
   end
 
-  it "Identifies localities successfully" do
-    locality = Locality.create(name: "KINGS HEATH")
+  context "locality" do
 
-    got_locality = Distiller::Distil.get_locality(@address)
+    it "Identifies localities successfully" do
+      locality = Locality.create(name: "KINGS HEATH")
 
-    expect(got_locality).to eq(locality)
+      got_locality = Distiller::Distil.get_locality(@address, nil)
+
+      expect(got_locality).to eq(locality)
+    end
+
+
+    it "Identifies localities successfully when locality is ambiguous" do
+      Locality.create(name: "KINGS HEATH", location: [54.435848, -1.562975])
+      locality = Locality.create(name: "KINGS HEATH", location: [52.435848,-1.892975])
+
+      got_locality = Distiller::Distil.get_locality(@address, nil)
+
+      expect(got_locality).to eq(locality)
+    end
+
   end
 
   it "Identifies towns successfully" do
