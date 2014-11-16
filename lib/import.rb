@@ -87,7 +87,7 @@ module Distiller
     end
 
     def self.parse_date(date, format = "%Y%m")
-      if !date.nil?
+      if !date.blank?
         DateTime.strptime(date, "%Y%m")
       end
     end
