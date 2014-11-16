@@ -41,7 +41,7 @@ module Distiller
     end
 
     def self.get_town(address)
-      Town.where(name: address['town']['name']).first
+      Town.where(name: address['town']['name'].titleize).first
     end
 
     def self.get_postcode(address)
