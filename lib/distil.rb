@@ -2,6 +2,7 @@ module Distiller
   class Distil
 
     def self.perform
+    extend Distiller::Helpers
       response = HTTParty.get(ENV['ERNEST_ADDRESS_ENDPOINT']).parsed_response
       pages = response["pages"].to_i
 
@@ -57,7 +58,8 @@ module Distiller
         if location.nil?
           street = street.first # If we don't have a geometry, we'll have to return a best guess for now
         else
-          street = Street.where(name: address['street']['name'], location: location).first
+          ll = en_to_ll(location[0], location[1])
+          street = Street.where(name: address['street']['name'], location: [ll[:lat], ll[:lng]]).first
         end
       elsif street.count == 0
         street = Street.create(name: address['street']['name']) # If there are no streets, create one
