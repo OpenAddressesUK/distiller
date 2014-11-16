@@ -48,7 +48,7 @@ module Distiller
       zip.close
 
       Zip::File.open(zip.path)do |zip_file|
-        entry = zip_file.glob('ONSPD_AUG_2014_csv/Data/*.csv').first
+        entry = zip_file.glob('Data/*.csv').first
         CSV.parse(entry.get_input_stream.read, headers: true) do |row|
           pc = UKPostcode.new(row['pcd'])
           ll = en_to_ll(row['oseast1m'], row['osnrth1m'])
