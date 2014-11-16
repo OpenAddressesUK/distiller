@@ -7,6 +7,11 @@ development:
 test:
   sessions:
     default:
-      database: distiller
+      database: distiller_test
       hosts:
         - localhost:27017
+
+production:
+  sessions:
+    default:
+      uri: <%= ENV['MONGOLAB_URI'] %>
