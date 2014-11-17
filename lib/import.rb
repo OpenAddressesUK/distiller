@@ -11,7 +11,8 @@ module Distiller
         Locality.create(
                           name: row['PLACE12NM'].chomp(")"),
                           authority: get_authority(row),
-                          location: [ll[:lat], ll[:lng]]
+                          lat_lng: [ll[:lat], ll[:lng]],
+                          easting_northing: [row['GRIDGB1N'], row['GRIDGB1E']]
                          )
       end
 
@@ -62,7 +63,8 @@ module Distiller
                           introduced: parse_date(row['dointr']),
                           terminated: parse_date(row['doterm']),
                           authority: row['oslaua'],
-                          location: [ll[:lat], ll[:lng]]
+                          lat_lng: [ll[:lat], ll[:lng]],
+                          easting_northing: [row['osnrth1m'], row['oseast1m']]
                          )
         end
       end
@@ -80,7 +82,8 @@ module Distiller
             settlement: row[8],
             locality: row[9],
             authority:row[11],
-            location: [ll[:lat], ll[:lng]]
+            lat_lng: [ll[:lat], ll[:lng]],
+            easting_northing: [row[3], row[2]]
           )
         end
       end

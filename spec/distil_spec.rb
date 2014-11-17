@@ -14,7 +14,7 @@ describe Distiller::Distil do
         "name" => "TEST ROAD",
         "geometry" => {
           "type" => "Point",
-          "coordinates" => [52.480185,-1.912451]
+          "coordinates" => [406043, 286921]
         }
       },
       "locality" => {
@@ -27,7 +27,7 @@ describe Distiller::Distil do
         "name" => "B1 2NN",
         "geometry" => {
           "type" => "Point",
-          "coordinates" => [52.480238,-1.911067]
+          "coordinates" => [406137,286927]
         }
       }
     }
@@ -94,8 +94,8 @@ describe Distiller::Distil do
     end
 
     it "Identifies streets successfully when street is ambiguous" do
-      Street.create(name: "TEST ROAD", location: [55.480185,-1.842451])
-      street = Street.create(name: "TEST ROAD", location: [52.480185,-1.912451])
+      Street.create(name: "TEST ROAD", easting_northing: [506043, 186921])
+      street = Street.create(name: "TEST ROAD", easting_northing: [406043, 286921])
 
       got_street = Distiller::Distil.get_street(@address)
 
@@ -137,11 +137,11 @@ describe Distiller::Distil do
 
 
     it "Identifies localities successfully when locality is ambiguous" do
-      Locality.create(name: "KINGS HEATH", location: [54.435848, -1.562975])
-      locality = Locality.create(name: "KINGS HEATH", location: [52.435848,-1.892975])
+      locality = Locality.create(name: "KINGS HEATH", easting_northing: [407460, 282970])
+      Locality.create(name: "KINGS HEATH", easting_northing: [307460, 182970])
       postcode = Postcode.create(
                                   name: @address['postcode']['name'],
-                                  location: [52.437305,-1.892883]
+                                  easting_northing: [407378, 282153]
                                 )
 
       got_locality = Distiller::Distil.get_locality(@address, postcode)

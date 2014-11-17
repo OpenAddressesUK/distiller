@@ -34,7 +34,13 @@ module Distiller
       locality = Locality.where(name: address['locality']['name'])
 
       if locality.count > 1
-        locality = locality.geo_near(postcode.location.to_a)
+        locality = Locality.where({
+                      name: address['locality']['name'],
+                      "easting_northing" => {
+                        "$near" => postcode.easting_northing.to_a,
+                        "$maxDistance" => 1000
+                      }
+                  })
       end
 
       return locality.first
@@ -59,8 +65,7 @@ module Distiller
         if location.nil?
           street = street.first # If we don't have a geometry, we'll have to return a best guess for now
         else
-          ll = en_to_ll(location[0], location[1])
-          street = Street.where(name: address['street']['name'], location: [ll[:lat], ll[:lng]]).first
+          street = Street.where(name: address['street']['name'], easting_northing: [location[0], location[1]]).first
         end
       elsif street.count == 0
         street = Street.create(name: address['street']['name']) # If there are no streets, create one
