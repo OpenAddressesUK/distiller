@@ -36,7 +36,7 @@ module Distiller
       rows.each do |row|
         area = row.css("td").first.inner_text
         towns = row.css("td").last.css("a[href^='/wiki']").each do |town|
-          Town.create(area: area, name: town.inner_text)
+          Town.create(area: area, name: town.inner_text.upcase)
         end
       end
     end
