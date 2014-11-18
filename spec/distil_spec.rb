@@ -70,12 +70,14 @@ describe Distiller::Distil do
 
     it "imports multiple pages of addresses" do
       stub_request(:get, ENV['ERNEST_ADDRESS_ENDPOINT']).
-        to_return(body: File.read(File.join(File.dirname(__FILE__), "fixtures", "multi-page.json")),
+        to_return(body: File.read(File.join(File.dirname(__FILE__), "fixtures", "page-1.json")),
                   headers: {"Content-Type" => "application/json"})
 
-      stub_request(:get, /#{ENV['ERNEST_ADDRESS_ENDPOINT']}\?page=./).
-        to_return(body: File.read(File.join(File.dirname(__FILE__), "fixtures", "multi-page.json")),
-                  headers: {"Content-Type" => "application/json"})
+      (1..5).each do |num|
+        stub_request(:get, "#{ENV['ERNEST_ADDRESS_ENDPOINT']}?page=#{num}").
+          to_return(body: File.read(File.join(File.dirname(__FILE__), "fixtures", "page-#{num}.json")),
+                    headers: {"Content-Type" => "application/json"})
+      end
 
       Distiller::Distil.perform
 

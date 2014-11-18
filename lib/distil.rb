@@ -15,7 +15,7 @@ module Distiller
           street = get_street(address)
           locality = get_locality(address, postcode)
           town = get_town(address)
-
+          
           Address.create(
             sao: address['saon']['name'],
             pao: address['paon']['name'],
