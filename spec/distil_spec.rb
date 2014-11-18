@@ -94,8 +94,8 @@ describe Distiller::Distil do
     end
 
     it "Identifies streets successfully when street is ambiguous" do
-      Street.create(name: "TEST ROAD", easting_northing: [506043, 186921])
-      street = Street.create(name: "TEST ROAD", easting_northing: [406043, 286921])
+      Street.create(name: "TEST ROAD", easting_northing: [186921, 506043])
+      street = Street.create(name: "TEST ROAD", easting_northing: [286921, 406043])
 
       got_street = Distiller::Distil.get_street(@address)
 
