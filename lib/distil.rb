@@ -65,7 +65,7 @@ module Distiller
         if location.nil?
           street = street.first # If we don't have a geometry, we'll have to return a best guess for now
         else
-          street = Street.where(name: address['street']['name'], easting_northing: [location[0], location[1]]).first
+          street = Street.where(name: address['street']['name'], easting_northing: [location[1], location[0]]).first
         end
       elsif street.count == 0
         street = Street.create(name: address['street']['name']) # If there are no streets, create one
