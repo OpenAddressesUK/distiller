@@ -13,4 +13,34 @@ namespace :db do
   end
 end
 
+namespace :distiller do
+  
+  namespace :import do
+  
+    task :towns do
+      Distiller::Import.towns
+    end
+    
+    task :postcodes do
+      Distiller::Import.postcodes
+    end
+
+    task :localities do
+      Distiller::Import.localities
+    end
+    
+    task :streets do
+      Distiller::Import.streets    
+    end
+  
+    task :all => [:towns, :postcodes, :localities, :streets]
+    
+  end
+  
+  task :distil, :pages do |task, args|
+    Distiller::Distil.perform(args[:pages])
+  end
+  
+end
+
 task :default => :spec
