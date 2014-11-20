@@ -40,10 +40,10 @@ describe Distiller::Distil do
       json = JSON.parse(File.read(File.join(File.dirname(__FILE__), "fixtures", "one-page.json")))
 
       json['addresses'].each do |address|
-        # FactoryGirl.create(:street, name: address['street']['name'])
-        #FactoryGirl.create(:locality, name: address['locality']['name'])
+        FactoryGirl.create(:street, name: address['street']['name'])
+        FactoryGirl.create(:locality, name: address['locality']['name'])
         FactoryGirl.create(:town, name: address['town']['name'])
-        #FactoryGirl.create(:postcode, name: address['postcode']['name'])
+        FactoryGirl.create(:postcode, name: address['postcode']['name'])
       end
     end
 
@@ -119,27 +119,25 @@ describe Distiller::Distil do
     end
 
     it "keeps retrying if it encounters an error" do
-      25.times { puts Address.count ; sleep 1 }
+      stub_request(:get, ENV['ERNEST_ADDRESS_ENDPOINT']).
+        to_return({:status => [500, "Internal Server Error"]}).times(2).then.
+        to_return(body: File.read(File.join(File.dirname(__FILE__), "fixtures", "one-page.json")),
+                  headers: {"Content-Type" => "application/json"})
 
-      # stub_request(:get, ENV['ERNEST_ADDRESS_ENDPOINT']).
-      #   to_return({:status => [500, "Internal Server Error"]}).times(2).then.
-      #   to_return(body: File.read(File.join(File.dirname(__FILE__), "fixtures", "one-page.json")),
-      #             headers: {"Content-Type" => "application/json"})
-      #
-      # stub_request(:get, "#{ENV['ERNEST_ADDRESS_ENDPOINT']}?page=1").
-      #   to_return({:status => [500, "Internal Server Error"]}).times(3).then.
-      #   to_return(body: File.read(File.join(File.dirname(__FILE__), "fixtures", "one-page.json")),
-      #             headers: {"Content-Type" => "application/json"})
-      #
-      # allow(Distiller::Distil).to receive(:sleep)
-      #
-      # expect(Distiller::Distil).to receive(:sleep).with(5).twice
-      # expect(Distiller::Distil).to receive(:sleep).with(10).twice
-      # expect(Distiller::Distil).to receive(:sleep).with(15).once
-      #
-      # Distiller::Distil.perform
-      #
-      # expect(Address.count).to eq 25
+      stub_request(:get, "#{ENV['ERNEST_ADDRESS_ENDPOINT']}?page=1").
+        to_return({:status => [500, "Internal Server Error"]}).times(3).then.
+        to_return(body: File.read(File.join(File.dirname(__FILE__), "fixtures", "one-page.json")),
+                  headers: {"Content-Type" => "application/json"})
+
+      allow(Distiller::Distil).to receive(:sleep)
+
+      expect(Distiller::Distil).to receive(:sleep).with(5).twice
+      expect(Distiller::Distil).to receive(:sleep).with(10).twice
+      expect(Distiller::Distil).to receive(:sleep).with(15).once
+
+      Distiller::Distil.perform
+
+      expect(Address.count).to eq 25
     end
 
   end
