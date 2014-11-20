@@ -1,0 +1,5 @@
+worker: bundle exec rake distiller:distil[1,5]
+worker: bundle exec rake distiller:distil[2,5]
+worker: bundle exec rake distiller:distil[3,5]
+worker: bundle exec rake distiller:distil[4,5]
+worker: bundle exec rake distiller:distil[5,5]
