@@ -86,6 +86,39 @@ describe Distiller::Distil do
 
   end
 
+  it "steps over pages of addresses" do
+    stub_request(:get, /#{ENV['ERNEST_ADDRESS_ENDPOINT']}(\?page=[0-9]+)?/).
+      to_return(body: File.read(File.join(File.dirname(__FILE__), "fixtures", "multi-page.json")),
+                headers: {"Content-Type" => "application/json"})
+
+    expect(HTTParty).to receive(:get).with("#{ENV['ERNEST_ADDRESS_ENDPOINT']}").and_call_original
+    expect(HTTParty).to receive(:get).with("#{ENV['ERNEST_ADDRESS_ENDPOINT']}?page=5").and_call_original
+    expect(HTTParty).to receive(:get).with("#{ENV['ERNEST_ADDRESS_ENDPOINT']}?page=10").and_call_original
+    expect(HTTParty).to receive(:get).with("#{ENV['ERNEST_ADDRESS_ENDPOINT']}?page=15").and_call_original
+    expect(HTTParty).to receive(:get).with("#{ENV['ERNEST_ADDRESS_ENDPOINT']}?page=20").and_call_original
+    expect(HTTParty).to receive(:get).with("#{ENV['ERNEST_ADDRESS_ENDPOINT']}?page=25").and_call_original
+
+    Distiller::Distil.perform(nil, 5)
+  end
+
+  it "steps over pages of addresses with an odd number" do
+    stub_request(:get, /#{ENV['ERNEST_ADDRESS_ENDPOINT']}(\?page=[0-9]+)?/).
+      to_return(body: File.read(File.join(File.dirname(__FILE__), "fixtures", "multi-page.json")),
+                headers: {"Content-Type" => "application/json"})
+
+    expect(HTTParty).to receive(:get).with("#{ENV['ERNEST_ADDRESS_ENDPOINT']}").and_call_original
+    expect(HTTParty).to receive(:get).with("#{ENV['ERNEST_ADDRESS_ENDPOINT']}?page=3").and_call_original
+    expect(HTTParty).to receive(:get).with("#{ENV['ERNEST_ADDRESS_ENDPOINT']}?page=6").and_call_original
+    expect(HTTParty).to receive(:get).with("#{ENV['ERNEST_ADDRESS_ENDPOINT']}?page=9").and_call_original
+    expect(HTTParty).to receive(:get).with("#{ENV['ERNEST_ADDRESS_ENDPOINT']}?page=12").and_call_original
+    expect(HTTParty).to receive(:get).with("#{ENV['ERNEST_ADDRESS_ENDPOINT']}?page=15").and_call_original
+    expect(HTTParty).to receive(:get).with("#{ENV['ERNEST_ADDRESS_ENDPOINT']}?page=18").and_call_original
+    expect(HTTParty).to receive(:get).with("#{ENV['ERNEST_ADDRESS_ENDPOINT']}?page=21").and_call_original
+    expect(HTTParty).to receive(:get).with("#{ENV['ERNEST_ADDRESS_ENDPOINT']}?page=24").and_call_original
+
+    Distiller::Distil.perform(nil, 3)
+  end
+
   context "get street" do
     it "Identifies streets successfully when there is a single candidate" do
       street = Street.create(name: "TEST ROAD")

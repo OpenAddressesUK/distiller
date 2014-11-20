@@ -3,15 +3,14 @@ module Distiller
 
     extend Distiller::Helpers
 
-    def self.perform(pages = nil)
+    def self.perform(pages = nil, s = 1)
       if pages.nil?
         response = HTTParty.get(ENV['ERNEST_ADDRESS_ENDPOINT']).parsed_response
         pages = response["pages"]
       end
       pages = pages.to_i
 
-      1.upto(pages) do |i|
-        
+      s.step(pages, s) do |i|
         response = HTTParty.get("#{ENV['ERNEST_ADDRESS_ENDPOINT']}?page=#{i}").parsed_response
         response['addresses'].each do |address|
           postcode = get_postcode(address)
@@ -19,7 +18,7 @@ module Distiller
           street = get_street(address)
           locality = get_locality(address, postcode)
           town = get_town(address)
-          
+
           Address.create(
             sao: address['saon']['name'],
             pao: address['paon']['name'],
