@@ -3,14 +3,12 @@ ruby '2.1.3'
 
 source 'https://rubygems.org'
 
-group :test do
-  gem 'rspec'
-  gem 'webmock'
-  gem 'vcr'
-  gem 'database_cleaner'
-  gem 'pry'
-  gem 'factory_girl'
-end
+gem 'rspec'
+gem 'webmock'
+gem 'vcr'
+gem 'database_cleaner'
+gem 'pry'
+gem 'factory_girl'
 
 gem 'httparty'
 gem 'mongoid'
