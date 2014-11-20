@@ -1,3 +1,4 @@
+worker: bundle exec rake import:all
 worker1: bundle exec rake distiller:distil[1,5]
 worker2: bundle exec rake distiller:distil[2,5]
 worker3: bundle exec rake distiller:distil[3,5]
