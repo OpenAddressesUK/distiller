@@ -40,10 +40,10 @@ describe Distiller::Distil do
       json = JSON.parse(File.read(File.join(File.dirname(__FILE__), "fixtures", "one-page.json")))
 
       json['addresses'].each do |address|
-        Street.create(name: address['street']['name'])
-        Locality.create(name: address['locality']['name'])
-        Town.create(name: address['town']['name'])
-        Postcode.create(name: address['postcode']['name'])
+        FactoryGirl.create(:street, name: address['street']['name'])
+        FactoryGirl.create(:locality, name: address['locality']['name'])
+        FactoryGirl.create(:town, name: address['town']['name'])
+        FactoryGirl.create(:postcode, name: address['postcode']['name'])
       end
     end
 
@@ -84,40 +84,62 @@ describe Distiller::Distil do
       expect(Address.count).to eq 125
     end
 
-  end
+    it "steps over pages of addresses" do
+      stub_request(:get, /#{ENV['ERNEST_ADDRESS_ENDPOINT']}(\?page=[0-9]+)?/).
+        to_return(body: File.read(File.join(File.dirname(__FILE__), "fixtures", "multi-page.json")),
+                  headers: {"Content-Type" => "application/json"})
 
-  it "steps over pages of addresses" do
-    stub_request(:get, /#{ENV['ERNEST_ADDRESS_ENDPOINT']}(\?page=[0-9]+)?/).
-      to_return(body: File.read(File.join(File.dirname(__FILE__), "fixtures", "multi-page.json")),
-                headers: {"Content-Type" => "application/json"})
+      expect(HTTParty).to receive(:get).with("#{ENV['ERNEST_ADDRESS_ENDPOINT']}").and_call_original
+      expect(HTTParty).to receive(:get).with("#{ENV['ERNEST_ADDRESS_ENDPOINT']}?page=1").and_call_original
+      expect(HTTParty).to receive(:get).with("#{ENV['ERNEST_ADDRESS_ENDPOINT']}?page=6").and_call_original
+      expect(HTTParty).to receive(:get).with("#{ENV['ERNEST_ADDRESS_ENDPOINT']}?page=11").and_call_original
+      expect(HTTParty).to receive(:get).with("#{ENV['ERNEST_ADDRESS_ENDPOINT']}?page=16").and_call_original
+      expect(HTTParty).to receive(:get).with("#{ENV['ERNEST_ADDRESS_ENDPOINT']}?page=21").and_call_original
 
-    expect(HTTParty).to receive(:get).with("#{ENV['ERNEST_ADDRESS_ENDPOINT']}").and_call_original
-    expect(HTTParty).to receive(:get).with("#{ENV['ERNEST_ADDRESS_ENDPOINT']}?page=1").and_call_original
-    expect(HTTParty).to receive(:get).with("#{ENV['ERNEST_ADDRESS_ENDPOINT']}?page=6").and_call_original
-    expect(HTTParty).to receive(:get).with("#{ENV['ERNEST_ADDRESS_ENDPOINT']}?page=11").and_call_original
-    expect(HTTParty).to receive(:get).with("#{ENV['ERNEST_ADDRESS_ENDPOINT']}?page=16").and_call_original
-    expect(HTTParty).to receive(:get).with("#{ENV['ERNEST_ADDRESS_ENDPOINT']}?page=21").and_call_original
+      Distiller::Distil.perform(nil, 1, 5)
+    end
 
-    Distiller::Distil.perform(nil, 1, 5)
-  end
+    it "steps over pages of addresses with an odd number" do
+      stub_request(:get, /#{ENV['ERNEST_ADDRESS_ENDPOINT']}(\?page=[0-9]+)?/).
+        to_return(body: File.read(File.join(File.dirname(__FILE__), "fixtures", "multi-page.json")),
+                  headers: {"Content-Type" => "application/json"})
 
-  it "steps over pages of addresses with an odd number" do
-    stub_request(:get, /#{ENV['ERNEST_ADDRESS_ENDPOINT']}(\?page=[0-9]+)?/).
-      to_return(body: File.read(File.join(File.dirname(__FILE__), "fixtures", "multi-page.json")),
-                headers: {"Content-Type" => "application/json"})
+      expect(HTTParty).to receive(:get).with("#{ENV['ERNEST_ADDRESS_ENDPOINT']}").and_call_original
+      expect(HTTParty).to receive(:get).with("#{ENV['ERNEST_ADDRESS_ENDPOINT']}?page=1").and_call_original
+      expect(HTTParty).to receive(:get).with("#{ENV['ERNEST_ADDRESS_ENDPOINT']}?page=4").and_call_original
+      expect(HTTParty).to receive(:get).with("#{ENV['ERNEST_ADDRESS_ENDPOINT']}?page=7").and_call_original
+      expect(HTTParty).to receive(:get).with("#{ENV['ERNEST_ADDRESS_ENDPOINT']}?page=10").and_call_original
+      expect(HTTParty).to receive(:get).with("#{ENV['ERNEST_ADDRESS_ENDPOINT']}?page=13").and_call_original
+      expect(HTTParty).to receive(:get).with("#{ENV['ERNEST_ADDRESS_ENDPOINT']}?page=16").and_call_original
+      expect(HTTParty).to receive(:get).with("#{ENV['ERNEST_ADDRESS_ENDPOINT']}?page=19").and_call_original
+      expect(HTTParty).to receive(:get).with("#{ENV['ERNEST_ADDRESS_ENDPOINT']}?page=22").and_call_original
+      expect(HTTParty).to receive(:get).with("#{ENV['ERNEST_ADDRESS_ENDPOINT']}?page=25").and_call_original
 
-    expect(HTTParty).to receive(:get).with("#{ENV['ERNEST_ADDRESS_ENDPOINT']}").and_call_original
-    expect(HTTParty).to receive(:get).with("#{ENV['ERNEST_ADDRESS_ENDPOINT']}?page=1").and_call_original
-    expect(HTTParty).to receive(:get).with("#{ENV['ERNEST_ADDRESS_ENDPOINT']}?page=4").and_call_original
-    expect(HTTParty).to receive(:get).with("#{ENV['ERNEST_ADDRESS_ENDPOINT']}?page=7").and_call_original
-    expect(HTTParty).to receive(:get).with("#{ENV['ERNEST_ADDRESS_ENDPOINT']}?page=10").and_call_original
-    expect(HTTParty).to receive(:get).with("#{ENV['ERNEST_ADDRESS_ENDPOINT']}?page=13").and_call_original
-    expect(HTTParty).to receive(:get).with("#{ENV['ERNEST_ADDRESS_ENDPOINT']}?page=16").and_call_original
-    expect(HTTParty).to receive(:get).with("#{ENV['ERNEST_ADDRESS_ENDPOINT']}?page=19").and_call_original
-    expect(HTTParty).to receive(:get).with("#{ENV['ERNEST_ADDRESS_ENDPOINT']}?page=22").and_call_original
-    expect(HTTParty).to receive(:get).with("#{ENV['ERNEST_ADDRESS_ENDPOINT']}?page=25").and_call_original
+      Distiller::Distil.perform(nil, 1, 3)
+    end
 
-    Distiller::Distil.perform(nil, 1, 3)
+    it "keeps retrying if it encounters an error" do
+      stub_request(:get, ENV['ERNEST_ADDRESS_ENDPOINT']).
+        to_return({:status => [500, "Internal Server Error"]}).times(2).then.
+        to_return(body: File.read(File.join(File.dirname(__FILE__), "fixtures", "one-page.json")),
+                  headers: {"Content-Type" => "application/json"})
+
+      stub_request(:get, "#{ENV['ERNEST_ADDRESS_ENDPOINT']}?page=1").
+        to_return({:status => [500, "Internal Server Error"]}).times(3).then.
+        to_return(body: File.read(File.join(File.dirname(__FILE__), "fixtures", "one-page.json")),
+                  headers: {"Content-Type" => "application/json"})
+
+      allow(Distiller::Distil).to receive(:sleep)
+
+      expect(Distiller::Distil).to receive(:sleep).with(5).twice
+      expect(Distiller::Distil).to receive(:sleep).with(10).twice
+      expect(Distiller::Distil).to receive(:sleep).with(15).once
+
+      Distiller::Distil.perform
+
+      expect(Address.count).to eq 25
+    end
+
   end
 
   context "get street" do

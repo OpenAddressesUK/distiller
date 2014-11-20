@@ -5,13 +5,14 @@ module Distiller
 
     def self.perform(pages = nil, start_index = 1, step = 1)
       if pages.nil?
-        response = HTTParty.get(ENV['ERNEST_ADDRESS_ENDPOINT']).parsed_response
+        response = request_with_retries(ENV['ERNEST_ADDRESS_ENDPOINT'])
         pages = response["pages"]
       end
       pages = pages.to_i
 
       start_index.step(pages, step) do |i|
-        response = HTTParty.get("#{ENV['ERNEST_ADDRESS_ENDPOINT']}?page=#{i}").parsed_response
+        response = request_with_retries("#{ENV['ERNEST_ADDRESS_ENDPOINT']}?page=#{i}")
+
         response['addresses'].each do |address|
           postcode = get_postcode(address)
 
@@ -75,6 +76,21 @@ module Distiller
       end
 
       return street
+    end
+
+    def self.request_with_retries(url)
+      tries = 1
+      begin
+        response = HTTParty.get(url)
+        raise ArgumentException if response.code != 200
+      rescue
+        retry_secs = 5 * tries
+        puts "#{url} responded with #{response.code}. Retrying in #{retry_secs} seconds."
+        sleep(retry_secs)
+        tries += 1
+        retry
+      end
+      response.parsed_response
     end
 
   end
