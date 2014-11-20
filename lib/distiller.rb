@@ -18,5 +18,7 @@ require 'import'
 require 'distil'
 require 'indexes'
 
+WebMock.allow_net_connect! unless ENV["MONGOID_ENVIRONMENT"] == test
+
 module Distiller
 end
