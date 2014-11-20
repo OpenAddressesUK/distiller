@@ -3,14 +3,14 @@ module Distiller
 
     extend Distiller::Helpers
 
-    def self.perform(pages = nil, s = 1)
+    def self.perform(pages = nil, start_index = 1, step = 1)
       if pages.nil?
         response = HTTParty.get(ENV['ERNEST_ADDRESS_ENDPOINT']).parsed_response
         pages = response["pages"]
       end
       pages = pages.to_i
 
-      s.step(pages, s) do |i|
+      start_index.step(pages, step) do |i|
         response = HTTParty.get("#{ENV['ERNEST_ADDRESS_ENDPOINT']}?page=#{i}").parsed_response
         response['addresses'].each do |address|
           postcode = get_postcode(address)
