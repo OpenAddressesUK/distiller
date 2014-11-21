@@ -40,8 +40,8 @@ describe Distiller::Distil do
       json = JSON.parse(File.read(File.join(File.dirname(__FILE__), "fixtures", "one-page.json")))
 
       json['addresses'].each do |address|
-        FactoryGirl.create(:street, name: address['street']['name'])
-        FactoryGirl.create(:locality, name: address['locality']['name'])
+        FactoryGirl.create(:street, name: address['street']['name'], easting_northing: [address['street']['geometry']['coordinates'][1], address['street']['geometry']['coordinates'][0]] )
+        FactoryGirl.create(:locality, name: address['locality']['name']) unless address['locality']['name'].blank?
         FactoryGirl.create(:town, name: address['town']['name'])
         FactoryGirl.create(:postcode, name: address['postcode']['name'])
       end

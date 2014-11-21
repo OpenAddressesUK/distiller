@@ -119,10 +119,17 @@
         "name": null
       },
       "paon": {
-        "name": "12 BON ACCORD SQUARE"
+        "name": "12"
       },
       "street": {
-        "name": null
+        "name": "BON ACCORD SQUARE",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            531412,
+            181441
+          ]
+        }
       },
       "locality": {
         "name": null
@@ -189,7 +196,14 @@
         "name": "FANE COURT"
       },
       "street": {
-        "name": null
+        "name": "COOPERS END ROAD",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            555145,
+            222875
+          ]
+        }
       },
       "locality": {
         "name": null
@@ -293,7 +307,14 @@
         "name": "7 GRANARD BUSINESS CENTRE"
       },
       "street": {
-        "name": null
+        "name": "COOPERS END ROAD",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            555145,
+            222875
+          ]
+        }
       },
       "locality": {
         "name": null
@@ -693,7 +714,14 @@
         "name": "5 MELVILLE CRESCENT"
       },
       "street": {
-        "name": null
+        "name": "COOPERS END ROAD",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            555145,
+            222875
+          ]
+        }
       },
       "locality": {
         "name": null
