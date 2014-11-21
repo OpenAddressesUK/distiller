@@ -1,6 +1,6 @@
 GIT
   remote: git://github.com/OpenAddressesUK/mongoid_address_models.git
-  revision: 7b1833dd350b2be11a8ede71ae531b3d8f8693e7
+  revision: 7e661b4f3681118845060374628c13f81338ff46
   specs:
     mongoid_address_models (0.0.1)
       mongoid
@@ -137,6 +137,7 @@ GEM
     thor (0.19.1)
     thread_safe (0.3.4)
     tilt (1.4.1)
+    timecop (0.7.1)
     tzinfo (1.2.2)
       thread_safe (~> 0.1)
     uk_postcode (1.0.0)
@@ -163,6 +164,7 @@ DEPENDENCIES
   rake
   rspec
   rubyzip
+  timecop
   uk_postcode
   vcr
   webmock
