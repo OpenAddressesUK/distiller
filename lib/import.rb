@@ -4,7 +4,12 @@ module Distiller
     extend Distiller::Helpers
 
     def self.localities
-      ipn = HTTParty.get("https://github.com/OpenAddressesUK/IPN_2012/blob/master/IPN2012.csv?raw=true").parsed_response
+      dataset_name = "Office for National Statistics Index of Place Names 2012 (E+W)"
+      dataset_url = "https://github.com/OpenAddressesUK/IPN_2012/blob/master/IPN2012.csv?raw=true"
+      downloaded_at = DateTime.now
+      description_url = "https://geoportal.statistics.gov.uk/geoportal/catalog/search/resource/details.page?uuid=%7BCDE30768-6419-4730-B434-B8B46BF9CBB1%7D"
+
+      ipn = HTTParty.get(dataset_url).parsed_response
 
       CSV.parse(ipn, headers: true) do |row|
         ll = en_to_ll(row['GRIDGB1E'], row['GRIDGB1N'])
@@ -12,7 +17,8 @@ module Distiller
                           name: row['PLACE12NM'].chomp(")"),
                           authority: get_authority(row),
                           lat_lng: [ll[:lat], ll[:lng]],
-                          easting_northing: [row['GRIDGB1N'], row['GRIDGB1E']]
+                          easting_northing: [row['GRIDGB1N'], row['GRIDGB1E']],
+                          provenance: create_provenance(dataset_url, dataset_name, downloaded_at, description_url)
                          )
       end
 
@@ -30,22 +36,32 @@ module Distiller
     end
 
     def self.towns
-      page = Nokogiri.parse HTTParty.get("https://en.wikipedia.org/wiki/List_of_post_towns_in_the_United_Kingdom").body
+      dataset_name = "Wikipedia list of Post Towns in the United Kingdom"
+      dataset_url = "https://en.wikipedia.org/wiki/List_of_post_towns_in_the_United_Kingdom"
+      downloaded_at = DateTime.now
+      description_url = "https://en.wikipedia.org/wiki/List_of_post_towns_in_the_United_Kingdom"
+
+      page = Nokogiri.parse HTTParty.get(dataset_url).body
       rows = page.css("table.toccolours tr")
       rows.shift # Remove the header row
 
       rows.each do |row|
         area = row.css("td").first.inner_text
         towns = row.css("td").last.css("a[href^='/wiki']").each do |town|
-          Town.create(area: area, name: town.inner_text.upcase)
+          Town.create(area: area, name: town.inner_text.upcase, provenance: create_provenance(dataset_url, dataset_name, downloaded_at, description_url))
         end
       end
     end
 
     def self.postcodes
+      dataset_name = "ONS Postcode Directory (UK) Aug 2014"
+      dataset_url = "https://geoportal.statistics.gov.uk/Docs/PostCodes/ONSPD_AUG_2014_csv.zip"
+      downloaded_at = DateTime.now
+      description_url = "https://geoportal.statistics.gov.uk/geoportal/catalog/search/resource/details.page?uuid=%7B473A5770-FB1B-4C1A-AEEC-5DC056E5EC7F%7D"
+
       zip = Tempfile.new("postcodes.zip")
       zip.binmode
-      zip.write HTTParty.get("https://geoportal.statistics.gov.uk/Docs/PostCodes/ONSPD_AUG_2014_csv.zip").parsed_response
+      zip.write HTTParty.get(dataset_url).parsed_response
       zip.close
 
       Zip::File.open(zip.path)do |zip_file|
@@ -64,7 +80,8 @@ module Distiller
                           terminated: parse_date(row['doterm']),
                           authority: row['oslaua'],
                           lat_lng: [ll[:lat], ll[:lng]],
-                          easting_northing: [row['osnrth1m'], row['oseast1m']]
+                          easting_northing: [row['osnrth1m'], row['oseast1m']],
+                          provenance: create_provenance(dataset_url, dataset_name, downloaded_at, description_url)
                          )
         end
       end
@@ -72,8 +89,13 @@ module Distiller
     end
 
     def self.streets
+      dataset_name = "OS Locator"
+      description_url = "http://www.ordnancesurvey.co.uk/business-and-government/products/os-locator.html"
+
       ("a".."d").each do |letter|
-        locator = HTTParty.get("https://github.com/OpenAddressesUK/OS_Locator/blob/gh-pages/OS_Locator2014_2_OPEN_xa#{letter}.txt?raw=true").parsed_response
+        dataset_url = "https://github.com/OpenAddressesUK/OS_Locator/blob/gh-pages/OS_Locator2014_2_OPEN_xa#{letter}.txt?raw=true"
+        downloaded_at = DateTime.now
+        locator = HTTParty.get(dataset_url).parsed_response
 
         CSV.parse(locator, col_sep: ":") do |row|
           ll = en_to_ll(row[2], row[3])
@@ -83,7 +105,8 @@ module Distiller
             locality: row[9],
             authority:row[11],
             lat_lng: [ll[:lat], ll[:lng]],
-            easting_northing: [row[3], row[2]]
+            easting_northing: [row[3], row[2]],
+            provenance: create_provenance(dataset_url, dataset_name, downloaded_at, description_url)
           )
         end
       end
@@ -93,6 +116,31 @@ module Distiller
       if !date.blank?
         DateTime.strptime(date, "%Y%m")
       end
+    end
+
+    def self.create_provenance(url, name, downloaded_at, description_url)
+      {
+        activity: {
+          executed_at: DateTime.now,
+          processing_scripts: "https://github.com/OpenAddressesUK/distiller",
+          derived_from: [
+            {
+              name: name,
+              type: "Source",
+              urls: [
+                url
+              ],
+              downloaded_at: downloaded_at,
+              description_url: description_url,
+              processing_script: "https://github.com/OpenAddressesUK/distiller/tree/#{current_sha}/lib/import.rb"
+            }
+          ]
+        }
+      }
+    end
+
+    def self.current_sha
+      @current_sha ||= `git rev-parse HEAD`
     end
 
   end

@@ -6,6 +6,7 @@ require 'pry'
 require 'database_cleaner'
 require 'distiller'
 require 'factory_girl'
+require 'timecop'
 
 VCR.configure do |c|
   c.cassette_library_dir = 'spec/cassettes'

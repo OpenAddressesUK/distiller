@@ -9,6 +9,7 @@ gem 'vcr'
 gem 'database_cleaner'
 gem 'pry'
 gem 'factory_girl'
+gem 'timecop'
 
 gem 'httparty'
 gem 'mongoid'
