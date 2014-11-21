@@ -140,7 +140,7 @@ module Distiller
     end
 
     def self.current_sha
-      @current_sha ||= `git rev-parse HEAD`
+      @current_sha ||= `git rev-parse HEAD`.chop!
     end
 
   end
