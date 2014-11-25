@@ -26,7 +26,23 @@ module Distiller
             street: street,
             locality: locality,
             town: town,
-            postcode: postcode
+            postcode: postcode,
+            provenance: {
+              activity: {
+                executed_at: DateTime.now,
+                processing_scripts: "https://github.com/OpenAddressesUK/distiller",
+                derived_from: [
+                  {
+                    type: "Source",
+                    urls: [
+                      address['url']
+                    ],
+                    downloaded_at: DateTime.now,
+                    processing_script: "https://github.com/OpenAddressesUK/distiller/tree/#{current_sha}/lib/distil.rb"
+                  }
+                ]
+              }
+            }
           )
         end
       end
