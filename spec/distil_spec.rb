@@ -81,6 +81,30 @@ describe Distiller::Distil do
               ],
               "downloaded_at" => Time.parse("2014-01-01").utc,
               "processing_script" => "https://github.com/OpenAddressesUK/distiller/tree/sdasdasdasd/lib/distil.rb"
+            },
+            {
+              "type" => "Source",
+              "urls" => [
+                "http://alpha.openaddressesuk.org/postcodes/#{address.postcode.token}"
+              ],
+              "downloaded_at" => Time.parse("2014-01-01").utc,
+              "processing_script" => "https://github.com/OpenAddressesUK/distiller/tree/sdasdasdasd/lib/distil.rb"
+            },
+            {
+              "type" => "Source",
+              "urls" => [
+                "http://alpha.openaddressesuk.org/streets/#{address.street.token}"
+              ],
+              "downloaded_at" => Time.parse("2014-01-01").utc,
+              "processing_script" => "https://github.com/OpenAddressesUK/distiller/tree/sdasdasdasd/lib/distil.rb"
+            },
+            {
+              "type" => "Source",
+              "urls" => [
+                "http://alpha.openaddressesuk.org/towns/#{address.town.token}"
+              ],
+              "downloaded_at" => Time.parse("2014-01-01").utc,
+              "processing_script" => "https://github.com/OpenAddressesUK/distiller/tree/sdasdasdasd/lib/distil.rb"
             }
           ]
         }
