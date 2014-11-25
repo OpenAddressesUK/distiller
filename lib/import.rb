@@ -138,10 +138,6 @@ module Distiller
         }
       }
     end
-
-    def self.current_sha
-      @current_sha ||= `git rev-parse HEAD`
-    end
-
+    
   end
 end
