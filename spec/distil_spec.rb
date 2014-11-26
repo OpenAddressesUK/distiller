@@ -48,6 +48,9 @@ describe Distiller::Distil do
     end
 
     it "imports one page of addresses" do
+      Timecop.freeze("2014-01-01")
+      allow(Distiller::Distil).to receive(:current_sha).and_return("sdasdasdasd")
+
       stub_request(:get, ENV['ERNEST_ADDRESS_ENDPOINT']).
         to_return(body: File.read(File.join(File.dirname(__FILE__), "fixtures", "one-page.json")),
                   headers: {"Content-Type" => "application/json"})
@@ -66,6 +69,46 @@ describe Distiller::Distil do
       expect(address.street.name).to eq("PEPPER ROAD")
       expect(address.town.name).to eq("LEEDS")
       expect(address.postcode.name).to eq("LS10 2RU")
+      expect(address.provenance).to eq({
+        "activity" => {
+          "executed_at" => Time.parse("2014-01-01").utc,
+          "processing_scripts" => "https://github.com/OpenAddressesUK/distiller",
+          "derived_from" => [
+            {
+              "type" => "Source",
+              "urls" => [
+                "http://ernest.openaddressesuk.org/addresses/1"
+              ],
+              "downloaded_at" => Time.parse("2014-01-01").utc,
+              "processing_script" => "https://github.com/OpenAddressesUK/distiller/tree/sdasdasdasd/lib/distil.rb"
+            },
+            {
+              "type" => "Source",
+              "urls" => [
+                "http://alpha.openaddressesuk.org/postcodes/#{address.postcode.token}"
+              ],
+              "downloaded_at" => Time.parse("2014-01-01").utc,
+              "processing_script" => "https://github.com/OpenAddressesUK/distiller/tree/sdasdasdasd/lib/distil.rb"
+            },
+            {
+              "type" => "Source",
+              "urls" => [
+                "http://alpha.openaddressesuk.org/streets/#{address.street.token}"
+              ],
+              "downloaded_at" => Time.parse("2014-01-01").utc,
+              "processing_script" => "https://github.com/OpenAddressesUK/distiller/tree/sdasdasdasd/lib/distil.rb"
+            },
+            {
+              "type" => "Source",
+              "urls" => [
+                "http://alpha.openaddressesuk.org/towns/#{address.town.token}"
+              ],
+              "downloaded_at" => Time.parse("2014-01-01").utc,
+              "processing_script" => "https://github.com/OpenAddressesUK/distiller/tree/sdasdasdasd/lib/distil.rb"
+            }
+          ]
+        }
+      })
     end
 
     it "imports multiple pages of addresses" do

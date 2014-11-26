@@ -9,5 +9,9 @@ module Distiller
       }
     end
 
+    def current_sha
+      @current_sha ||= `git rev-parse HEAD`.strip
+    end
+
   end
 end

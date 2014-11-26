@@ -26,7 +26,14 @@ module Distiller
             street: street,
             locality: locality,
             town: town,
-            postcode: postcode
+            postcode: postcode,
+            provenance: {
+              activity: {
+                executed_at: DateTime.now,
+                processing_scripts: "https://github.com/OpenAddressesUK/distiller",
+                derived_from: derivations(address, [postcode, street, locality, town])
+              }
+            }
           )
         end
       end
@@ -91,6 +98,36 @@ module Distiller
         retry
       end
       response.parsed_response
+    end
+
+    def self.derivations(address, parts)
+      derivations = [
+        {
+          type: "Source",
+          urls: [
+            address['url']
+          ],
+          downloaded_at: DateTime.now,
+          processing_script: "https://github.com/OpenAddressesUK/distiller/tree/#{current_sha}/lib/distil.rb"
+        },
+      ]
+
+      parts.delete_if { |p| p.nil? }.each do |part|
+        derivations << {
+          type: "Source",
+          urls: [
+            part_url(part)
+          ],
+          downloaded_at: DateTime.now,
+          processing_script: "https://github.com/OpenAddressesUK/distiller/tree/#{current_sha}/lib/distil.rb"
+        }
+      end
+
+      derivations
+    end
+
+    def self.part_url(part)
+      "http://alpha.openaddressesuk.org/#{part.class.to_s.downcase.pluralize}/#{part.token}"
     end
 
   end
