@@ -11,6 +11,7 @@ module Distiller
       pages = pages.to_i
 
       start_index.step(pages, step) do |i|
+
         response = request_with_retries("#{ENV['ERNEST_ADDRESS_ENDPOINT']}?page=#{i}")
 
         response['addresses'].each do |address|
@@ -20,7 +21,7 @@ module Distiller
           locality = get_locality(address, postcode)
           town = get_town(address)
 
-          Address.create(
+          a = Address.create(
             sao: address['saon']['name'],
             pao: address['paon']['name'],
             street: street,
@@ -35,6 +36,10 @@ module Distiller
               }
             }
           )
+
+          if a.valid?
+            puts "Address #{a.full_address} created"
+          end
         end
       end
     end
