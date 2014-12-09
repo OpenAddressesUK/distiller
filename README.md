@@ -1,6 +1,10 @@
 distiller
 =========
-This is the repository for Open Addresses' "Distiller" software component, part of the solution we deployed for the Alpha stage of our services. Read about the Distiller [here](http://openaddressesuk.org/docs) or learn about Open Addresses in general [here](http://openaddressesuk.org).
+This is the repository for Open Addresses' "Distiller" software component, part of the solution we deployed for the Alpha stage of our services. 
+
+This component extracts addresses from the [Ernest](https://github.com/OpenAddressesUK/ernest) master database, checks for duplicates, and matches address parts (towns, streets, localities and postcodes) to exact entities.
+
+Read about our production setup [here](http://openaddressesuk.org/docs) or learn about Open Addresses in general [here](http://openaddressesuk.org).
 
 ## Dependencies
 
