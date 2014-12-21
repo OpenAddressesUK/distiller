@@ -12,9 +12,9 @@ As well as Ruby version 2.1.3, you'll also need MongoDB installed. [See installa
 
 ## Running
 
-### Clone the repo:
+### Clone this repo:
 
-    git clone git@github.com:OpenAddressesUK/theodolite.git
+    git clone git@github.com:OpenAddressesUK/distiller.git
 
 ### Bundle:
 
