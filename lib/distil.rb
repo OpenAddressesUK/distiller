@@ -4,15 +4,12 @@ module Distiller
     extend Distiller::Helpers
 
     def self.perform(pages = nil, start_index = 1, step = 1)
-      if pages.nil?
-        response = request_with_retries(ENV['ERNEST_ADDRESS_ENDPOINT'])
-        pages = response["pages"]
-      end
-      pages = pages.to_i
+      url = create_url
+      pages = get_pages(pages)
 
       start_index.step(pages, step) do |i|
-
-        response = request_with_retries("#{ENV['ERNEST_ADDRESS_ENDPOINT']}?page=#{i}")
+        url.query_values = (url.query_values || {}).merge({"page" => i})
+        response = request_with_retries(url.to_s)
 
         response['addresses'].each do |address|
           postcode = get_postcode(address)
@@ -42,6 +39,19 @@ module Distiller
           end
         end
       end
+    end
+
+    def self.create_url
+      url = Addressable::URI.parse(ENV['ERNEST_ADDRESS_ENDPOINT'])
+      url
+    end
+
+    def self.get_pages(pages)
+      if pages.nil?
+        response = request_with_retries(ENV['ERNEST_ADDRESS_ENDPOINT'])
+        pages = response["pages"]
+      end
+      pages.to_i
     end
 
     def self.get_locality(address, postcode)
