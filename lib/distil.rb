@@ -12,32 +12,35 @@ module Distiller
         response = request_with_retries(url.to_s)
 
         response['addresses'].each do |address|
-          postcode = get_postcode(address)
-
-          street = get_street(address)
-          locality = get_locality(address, postcode)
-          town = get_town(address)
-
-          a = Address.create(
-            sao: address['saon']['name'],
-            pao: address['paon']['name'],
-            street: street,
-            locality: locality,
-            town: town,
-            postcode: postcode,
-            provenance: {
-              activity: {
-                executed_at: DateTime.now,
-                processing_scripts: "https://github.com/OpenAddressesUK/distiller",
-                derived_from: derivations(address, [postcode, street, locality, town])
-              }
-            }
-          )
-
-          if a.valid?
-            puts "Address #{a.full_address} created"
-          end
+          create_address(address)
         end
+      end
+    end
+
+    def self.create_address(address)
+      postcode = get_postcode(address)
+      street = get_street(address)
+      locality = get_locality(address, postcode)
+      town = get_town(address)
+
+      a = Address.create(
+        sao: address['saon']['name'],
+        pao: address['paon']['name'],
+        street: street,
+        locality: locality,
+        town: town,
+        postcode: postcode,
+        provenance: {
+          activity: {
+            executed_at: DateTime.now,
+            processing_scripts: "https://github.com/OpenAddressesUK/distiller",
+            derived_from: derivations(address, [postcode, street, locality, town])
+          }
+        }
+      )
+
+      if a.valid?
+        puts "Address #{a.full_address} created"
       end
     end
 
