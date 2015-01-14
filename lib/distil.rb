@@ -3,9 +3,9 @@ module Distiller
 
     extend Distiller::Helpers
 
-    def self.perform(pages = nil, start_index = 1, step = 1)
-      url = create_url
-      pages = get_pages(pages)
+    def self.perform(pages = nil, start_index = 1, step = 1, get_latest = false)
+      url = create_url(get_latest)
+      pages = get_pages(url, pages)
 
       start_index.step(pages, step) do |i|
         url.query_values = (url.query_values || {}).merge({"page" => i})
@@ -41,14 +41,24 @@ module Distiller
       end
     end
 
-    def self.create_url
+    def self.latest
+      perform(nil, 1, 1, true)
+    end
+
+    def self.create_url(get_latest)
       url = Addressable::URI.parse(ENV['ERNEST_ADDRESS_ENDPOINT'])
+
+      if get_latest == true
+        latest = Address.order_by(:updated_at.asc).last.updated_at.utc.iso8601
+        url.query_values = { updated_since: latest }
+      end
+
       url
     end
 
-    def self.get_pages(pages)
+    def self.get_pages(url, pages)
       if pages.nil?
-        response = request_with_retries(ENV['ERNEST_ADDRESS_ENDPOINT'])
+        response = request_with_retries(url.to_s)
         pages = response["pages"]
       end
       pages.to_i
