@@ -37,12 +37,18 @@ namespace :distiller do
 
   end
 
-  task :distil_pages, :pages do |task, args|
-    Distiller::Distil.perform(args[:pages])
-  end
+  namespace :distil do
+    task :pages, :pages do |task, args|
+      Distiller::Distil.perform(args[:pages])
+    end
 
-  task :distil, :start_index, :step do |task, args|
-    Distiller::Distil.perform(nil, args[:start_index].to_i, args[:step].to_i)
+    task :all, :start_index, :step do |task, args|
+      Distiller::Distil.perform(nil, args[:start_index].to_i, args[:step].to_i)
+    end
+
+    task :latest do
+      Distiller::Distil.latest
+    end
   end
 
 end

@@ -13,6 +13,7 @@ require 'httparty'
 require 'nokogiri'
 require 'zip'
 require 'uk_postcode'
+require 'addressable/uri'
 
 require 'helpers'
 require 'import'

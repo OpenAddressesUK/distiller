@@ -183,6 +183,29 @@ describe Distiller::Distil do
       expect(Address.count).to eq 25
     end
 
+    it "only distils the latest addresses if specified" do
+      Timecop.freeze("2014-01-01")
+
+      FactoryGirl.create(:address)
+
+      allow(Distiller::Distil).to receive(:current_sha).and_return("sdasdasdasd")
+
+      puts "#{ENV['ERNEST_ADDRESS_ENDPOINT']}?updated_since=#{URI.escape(Time.now.utc.iso8601)}"
+
+      stub_request(:get, "#{ENV['ERNEST_ADDRESS_ENDPOINT']}?updated_since=#{CGI.escape(Time.now.utc.iso8601)}").
+                to_return(body: File.read(File.join(File.dirname(__FILE__), "fixtures", "one-page.json")),
+                          headers: {"Content-Type" => "application/json"})
+
+      stub_request(:get, "#{ENV['ERNEST_ADDRESS_ENDPOINT']}?page=1&updated_since=#{CGI.escape(Time.now.utc.iso8601)}").
+                  to_return(body: File.read(File.join(File.dirname(__FILE__), "fixtures", "one-page.json")),
+                            headers: {"Content-Type" => "application/json"})
+
+      expect(HTTParty).to receive(:get).with("#{ENV['ERNEST_ADDRESS_ENDPOINT']}?updated_since=#{CGI.escape(Time.now.utc.iso8601)}").and_call_original
+      expect(HTTParty).to receive(:get).with("#{ENV['ERNEST_ADDRESS_ENDPOINT']}?page=1&updated_since=#{CGI.escape(Time.now.utc.iso8601)}").and_call_original
+
+      Distiller::Distil.latest
+    end
+
   end
 
   context "get street" do

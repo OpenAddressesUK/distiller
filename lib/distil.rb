@@ -3,45 +3,68 @@ module Distiller
 
     extend Distiller::Helpers
 
-    def self.perform(pages = nil, start_index = 1, step = 1)
-      if pages.nil?
-        response = request_with_retries(ENV['ERNEST_ADDRESS_ENDPOINT'])
-        pages = response["pages"]
-      end
-      pages = pages.to_i
+    def self.perform(pages = nil, start_index = 1, step = 1, get_latest = false)
+      url = create_url(get_latest)
+      pages = get_pages(url, pages)
 
       start_index.step(pages, step) do |i|
-
-        response = request_with_retries("#{ENV['ERNEST_ADDRESS_ENDPOINT']}?page=#{i}")
+        url.query_values = (url.query_values || {}).merge({"page" => i})
+        response = request_with_retries(url.to_s)
 
         response['addresses'].each do |address|
-          postcode = get_postcode(address)
-
-          street = get_street(address)
-          locality = get_locality(address, postcode)
-          town = get_town(address)
-
-          a = Address.create(
-            sao: address['saon']['name'],
-            pao: address['paon']['name'],
-            street: street,
-            locality: locality,
-            town: town,
-            postcode: postcode,
-            provenance: {
-              activity: {
-                executed_at: DateTime.now,
-                processing_scripts: "https://github.com/OpenAddressesUK/distiller",
-                derived_from: derivations(address, [postcode, street, locality, town])
-              }
-            }
-          )
-
-          if a.valid?
-            puts "Address #{a.full_address} created"
-          end
+          create_address(address)
         end
       end
+    end
+
+    def self.create_address(address)
+      postcode = get_postcode(address)
+      street = get_street(address)
+      locality = get_locality(address, postcode)
+      town = get_town(address)
+
+      a = Address.create(
+        sao: address['saon']['name'],
+        pao: address['paon']['name'],
+        street: street,
+        locality: locality,
+        town: town,
+        postcode: postcode,
+        provenance: {
+          activity: {
+            executed_at: DateTime.now,
+            processing_scripts: "https://github.com/OpenAddressesUK/distiller",
+            derived_from: derivations(address, [postcode, street, locality, town])
+          }
+        }
+      )
+
+      if a.valid?
+        puts "Address #{a.full_address} created"
+      end
+    end
+
+    def self.latest
+      perform(nil, 1, 1, true)
+    end
+
+    def self.create_url(get_latest)
+      url = Addressable::URI.parse(ENV['ERNEST_ADDRESS_ENDPOINT'])
+
+      if get_latest == true
+        latest = Address.order_by(:updated_at.asc).last.updated_at.utc.iso8601
+        url.query_values = { updated_since: latest }
+      end
+
+      url
+    end
+
+    def self.get_pages(url, pages)
+      if pages.nil?
+        response = request_with_retries(url.to_s)
+        pages = response["pages"]
+      end
+      pages.to_i
     end
 
     def self.get_locality(address, postcode)
