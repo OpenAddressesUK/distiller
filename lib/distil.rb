@@ -70,7 +70,7 @@ module Distiller
     def self.get_locality(address, postcode)
       return nil if address['locality']['name'].nil?
 
-      locality = Locality.where(name: address['locality']['name'])
+      locality = Locality.where(name: address['locality']['name'].upcase)
 
       if locality.count > 1
         locality = Locality.where({
@@ -86,7 +86,7 @@ module Distiller
     end
 
     def self.get_town(address)
-      Town.where(name: address['town']['name']).first
+      Town.where(name: address['town']['name'].upcase).first
     end
 
     def self.get_postcode(address)
@@ -95,7 +95,7 @@ module Distiller
     end
 
     def self.get_street(address)
-      street = Street.where(name: address['street']['name'])
+      street = Street.where(name: address['street']['name'].upcase)
 
       if street.count == 1
         street = street.first
