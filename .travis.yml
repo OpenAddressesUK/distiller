@@ -1,16 +1,22 @@
 language: ruby
 services:
-  - mongodb
+- mongodb
 rvm:
-  - 2.1.3
+- 2.1.3
 env:
-  global:
-    ERNEST_ADDRESS_ENDPOINT=http://ernest.dev
+  global: ERNEST_ADDRESS_ENDPOINT=http://ernest.dev
 notifications:
   irc:
     channels:
     - irc.freenode.net#openaddresses
     template:
-    - "%{repository} %{branch} - %{message} %{build_url}"
+    - '%{repository} %{branch} - %{message} %{build_url}'
     on_success: change
     on_failure: always
+deploy:
+  provider: heroku
+  api_key:
+    secure: Z4PiRqOcdv/le7AgOEKNswxVkXTokqrv3lYLSuh3yRzjAV8TbYxzczdh5JIS0gnBqTSgL6NGvuza93IffJNjfNhYurOSmLu4qYkoxQmbJPqv1LQ/p08K0Chv65ot9rSpPTBLOsXS11zCHYqoh49wApXJ6ASnirWYNW+QXNPRLuA=
+  app: hidden-bayou-9267
+  on:
+    repo: OpenAddressesUK/distiller
