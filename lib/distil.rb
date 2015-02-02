@@ -86,6 +86,7 @@ module Distiller
     end
 
     def self.get_town(address)
+      return nil if address['town']['name'].nil?
       Town.where(name: address['town']['name'].upcase).first
     end
 
@@ -95,6 +96,7 @@ module Distiller
     end
 
     def self.get_street(address)
+      return nil if address['street']['name'].nil?
       street = Street.where(name: address['street']['name'].upcase)
 
       if street.count == 1
