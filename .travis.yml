@@ -17,6 +17,6 @@ deploy:
   provider: heroku
   api_key:
     secure: Z4PiRqOcdv/le7AgOEKNswxVkXTokqrv3lYLSuh3yRzjAV8TbYxzczdh5JIS0gnBqTSgL6NGvuza93IffJNjfNhYurOSmLu4qYkoxQmbJPqv1LQ/p08K0Chv65ot9rSpPTBLOsXS11zCHYqoh49wApXJ6ASnirWYNW+QXNPRLuA=
-  app: hidden-bayou-9267
+  app: oa-distiller
   on:
     repo: OpenAddressesUK/distiller
