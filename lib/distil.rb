@@ -36,7 +36,8 @@ module Distiller
             processing_scripts: "https://github.com/OpenAddressesUK/distiller",
             derived_from: derivations(address, [postcode, street, locality, town])
           }
-        }
+        },
+        source: address['derived_from'].first['type']
       )
 
       if a.valid?
