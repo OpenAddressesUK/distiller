@@ -47,6 +47,7 @@ namespace :distiller do
     end
 
     task :latest do
+      desc "Distil latest"
       Distiller::Distil.latest
     end
   end
