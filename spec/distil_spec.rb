@@ -69,6 +69,7 @@ describe Distiller::Distil do
       expect(address.street.name).to eq("PEPPER ROAD")
       expect(address.town.name).to eq("LEEDS")
       expect(address.postcode.name).to eq("LS10 2RU")
+      expect(address.source).to eq("Source")
       expect(address.provenance).to eq({
         "activity" => {
           "executed_at" => Time.parse("2014-01-01").utc,
