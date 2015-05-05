@@ -208,7 +208,56 @@ describe Distiller::Distil do
     end
 
     it 'updates an existing address with a UPRN' do
-      a = FactoryGirl.create(:address)
+      Timecop.freeze("2015-01-01")
+
+      a = FactoryGirl.create(:address,
+                            pao: 123,
+                            street: FactoryGirl.create(:street, name: "TEST ROAD", easting_northing: [406043, 286921]),
+                            locality: FactoryGirl.create(:locality, name: "KINGS HEATH"),
+                            town: FactoryGirl.create(:town, name: "BIRMINGHAM"),
+                            postcode: FactoryGirl.create(:postcode, name: "B1 2NN", easting_northing: [406137,286927]),
+                            provenance: {
+                              "activity" => {
+                                "executed_at" => Time.parse("2014-01-01").utc,
+                                "processing_scripts" => "https://github.com/OpenAddressesUK/distiller",
+                                "derived_from" => [
+                                  {
+                                    "type" => "Source",
+                                    "urls" => [
+                                      "http://ernest.openaddressesuk.org/addresses/1"
+                                    ],
+                                    "downloaded_at" => Time.parse("2014-01-01").utc,
+                                    "processing_script" => "https://github.com/OpenAddressesUK/distiller/tree/sdasdasdasd/lib/distil.rb"
+                                  },
+                                  {
+                                    "type" => "Source",
+                                    "urls" => [
+                                      "http://alpha.openaddressesuk.org/postcodes/44323"
+                                    ],
+                                    "downloaded_at" => Time.parse("2014-01-01").utc,
+                                    "processing_script" => "https://github.com/OpenAddressesUK/distiller/tree/sdasdasdasd/lib/distil.rb"
+                                  },
+                                  {
+                                    "type" => "Source",
+                                    "urls" => [
+                                      "http://alpha.openaddressesuk.org/streets/34534534"
+                                    ],
+                                    "downloaded_at" => Time.parse("2014-01-01").utc,
+                                    "processing_script" => "https://github.com/OpenAddressesUK/distiller/tree/sdasdasdasd/lib/distil.rb"
+                                  },
+                                  {
+                                    "type" => "Source",
+                                    "urls" => [
+                                      "http://alpha.openaddressesuk.org/towns/43534"
+                                    ],
+                                    "downloaded_at" => Time.parse("2014-01-01").utc,
+                                    "processing_script" => "https://github.com/OpenAddressesUK/distiller/tree/sdasdasdasd/lib/distil.rb"
+                                  }
+                                ]
+                              }
+                            }
+                            )
+
       allow(Distiller::Distil).to receive(:current_sha).and_return("sdasdasdasd")
 
       data = {
@@ -217,7 +266,7 @@ describe Distiller::Distil do
         "total" => 25,
         "addresses" => [
           {
-            "url" => "http://ernest.openaddressesuk.org/addresses/1",
+            "url" => "http://ernest.openaddressesuk.org/addresses/2",
             "uprn" => {
               "name" => "100012345678"
             },
@@ -285,6 +334,11 @@ describe Distiller::Distil do
       Distiller::Distil.perform
       expect(Address.count).to eq 1
       expect(Address.first.uprn).to eq '100012345678'
+      expect(Address.first.provenance["activity"]["executed_at"]).to eq(Time.parse("2015-01-01"))
+      expect(Address.first.provenance["activity"]["derived_from"].count).to eq(5)
+      expect(Address.first.provenance["activity"]["derived_from"].last["urls"].last).to eq("http://ernest.openaddressesuk.org/addresses/2")
+
+      Timecop.return
     end
 
   end
