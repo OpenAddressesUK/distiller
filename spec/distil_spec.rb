@@ -207,6 +207,86 @@ describe Distiller::Distil do
       Distiller::Distil.latest
     end
 
+    it 'updates an existing address with a UPRN' do
+      a = FactoryGirl.create(:address)
+      allow(Distiller::Distil).to receive(:current_sha).and_return("sdasdasdasd")
+
+      data = {
+        "current_page" => 1,
+        "pages" => 1,
+        "total" => 25,
+        "addresses" => [
+          {
+            "url" => "http://ernest.openaddressesuk.org/addresses/1",
+            "uprn" => {
+              "name" => "100012345678"
+            },
+            "saon" => {
+              "name" => a.sao
+            },
+            "paon" => {
+              "name" => a.pao
+            },
+            "street" => {
+              "name" => a.street.name,
+              "geometry" => {
+                "type" => "Point",
+                "coordinates" => [
+                  a.street.lat_lng.x,
+                  a.street.lat_lng.y
+                ]
+              }
+            },
+            "locality" => {
+              "name" => a.locality.name
+            },
+            "town" => {
+              "name" => a.town.name
+            },
+            "postcode" => {
+              "name" => a.postcode.name,
+              "geometry" => {
+                "type" => "Point",
+                "coordinates" => [
+                  a.street.lat_lng.x,
+                  a.street.lat_lng.y
+                ]
+              }
+            },
+            "provenance" => {
+              "activity" => {
+                "processing_script" => "https://github.com/OpenAddressesUK/common-ETL/blob/efcd9970fc63c12b2f1aef410f87c2dcb4849aa3/CH_Bulk_Extractor.py",
+                "executed_at" => "2014-11-19T09:53:14.000Z",
+                "derived_from" => [
+                  {
+                    "type" => "Source",
+                    "description_url" => "http://download.companieshouse.gov.uk/en_output.html",
+                    "url" => [
+                      "http://download.companieshouse.gov.uk/BasicCompanyData-2014-11-01-part1_5.zip",
+                      "http://download.companieshouse.gov.uk/BasicCompanyData-2014-11-01-part2_5.zip",
+                      "http://download.companieshouse.gov.uk/BasicCompanyData-2014-11-01-part3_5.zip",
+                      "http://download.companieshouse.gov.uk/BasicCompanyData-2014-11-01-part4_5.zip",
+                      "http://download.companieshouse.gov.uk/BasicCompanyData-2014-11-01-part5_5.zip"
+                    ],
+                    "name" => "Companies House's \"Free Company Data Product\"",
+                    "executed_at" => "2014-11-19T09:30:00Z",
+                    "processing_scripts" => "https://github.com/OpenAddressesUK/common-ETL/blob/efcd9970fc63c12b2f1aef410f87c2dcb4849aa3/CH_download.py"
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      }
+
+      stub_request(:get, /#{ENV['ERNEST_ADDRESS_ENDPOINT']}/).
+        to_return(body: data.to_json, headers: {"Content-Type" => "application/json"})
+
+      Distiller::Distil.perform
+      expect(Address.count).to eq 1
+      expect(Address.first.uprn).to eq '100012345678'
+    end
+
   end
 
   context "get street" do
