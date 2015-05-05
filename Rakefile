@@ -48,7 +48,7 @@ namespace :distiller do
 
     task :latest do
       desc "Distil latest"
-      Distiller::Distil.latest
+      Distiller::Distil.from_date(ENV['DATE_TIME'] || nil)
     end
   end
 

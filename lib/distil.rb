@@ -3,8 +3,8 @@ module Distiller
 
     extend Distiller::Helpers
 
-    def self.perform(pages = nil, start_index = 1, step = 1, get_latest = false)
-      url = create_url(get_latest)
+    def self.perform(pages = nil, start_index = 1, step = 1, date_time = nil)
+      url = create_url(date_time)
       pages = get_pages(url, pages)
 
       start_index.step(pages, step) do |i|
@@ -45,17 +45,18 @@ module Distiller
       end
     end
 
-    def self.latest
-      perform(nil, 1, 1, true)
+    def self.from_date(date_time = nil)
+      if date_time.nil?
+        date_time = Address.order_by(:updated_at.asc).last.updated_at.utc.iso8601
+      else
+        date_time = Time.parse(date_time).utc.iso8601
+      end
+      perform(nil, 1, 1, date_time)
     end
 
-    def self.create_url(get_latest)
+    def self.create_url(date_time)
       url = Addressable::URI.parse(ENV['ERNEST_ADDRESS_ENDPOINT'])
-
-      if get_latest == true
-        latest = Address.order_by(:updated_at.asc).last.updated_at.utc.iso8601
-        url.query_values = { updated_since: latest }
-      end
+      url.query_values = { updated_since: date_time } unless date_time.nil?
 
       url
     end
