@@ -152,6 +152,24 @@ describe Distiller::Distil do
       expect(Address.count).to eq 25
     end
 
+    it "deletes the lock after each distilation" do
+      allow(Distiller::Distil).to receive(:current_sha).and_return("sdasdasdasd")
+
+      stub_request(:get, ENV['ERNEST_ADDRESS_ENDPOINT']).
+        to_return(body: File.read(File.join(File.dirname(__FILE__), "fixtures", "one-page.json")),
+                  headers: {"Content-Type" => "application/json"})
+
+      stub_request(:get, "#{ENV['ERNEST_ADDRESS_ENDPOINT']}?page=1").
+        to_return(body: File.read(File.join(File.dirname(__FILE__), "fixtures", "one-page.json")),
+                  headers: {"Content-Type" => "application/json"})
+
+      expect(Distiller::Lock).to receive(:create).and_call_original
+
+      Distiller::Distil.perform
+
+      expect(Distiller::Lock.count).to eq(0)
+    end
+
     it "steps over pages of addresses" do
       stub_request(:get, /#{ENV['ERNEST_ADDRESS_ENDPOINT']}(\?page=[0-9]+)?/).
         to_return(body: File.read(File.join(File.dirname(__FILE__), "fixtures", "multi-page.json")),
