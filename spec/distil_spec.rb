@@ -128,6 +128,30 @@ describe Distiller::Distil do
       expect(Address.count).to eq 125
     end
 
+    it "does not create duplicates" do
+      Timecop.freeze("2014-01-01")
+
+      allow(Distiller::Distil).to receive(:current_sha).and_return("sdasdasdasd")
+
+      stub_request(:get, ENV['ERNEST_ADDRESS_ENDPOINT']).
+        to_return(body: File.read(File.join(File.dirname(__FILE__), "fixtures", "one-page.json")),
+                  headers: {"Content-Type" => "application/json"})
+
+      stub_request(:get, "#{ENV['ERNEST_ADDRESS_ENDPOINT']}?page=1").
+        to_return(body: File.read(File.join(File.dirname(__FILE__), "fixtures", "one-page.json")),
+                  headers: {"Content-Type" => "application/json"})
+
+      threads = []
+
+      2.times do
+        threads << Thread.new { Distiller::Distil.perform }
+      end
+
+      threads.each { |thr| thr.join }
+
+      expect(Address.count).to eq 25
+    end
+
     it "steps over pages of addresses" do
       stub_request(:get, /#{ENV['ERNEST_ADDRESS_ENDPOINT']}(\?page=[0-9]+)?/).
         to_return(body: File.read(File.join(File.dirname(__FILE__), "fixtures", "multi-page.json")),
