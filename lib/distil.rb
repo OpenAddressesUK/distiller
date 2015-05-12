@@ -10,8 +10,8 @@ module Distiller
     def self.perform(pages = nil, start_index = 1, step = 1, date_time = nil)
       # Check if lock exists
       unless lock_exists?
+        create_lock
         begin
-          create_lock
           url = create_url(date_time)
           pages = get_pages(url, pages)
 
