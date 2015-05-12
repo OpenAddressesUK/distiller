@@ -1,6 +1,10 @@
 module Distiller
   class Lock
     include Mongoid::Document
+
+    validates_uniqueness_of :name
+
+    field :name, default: "lock"
   end
 
   class Distil

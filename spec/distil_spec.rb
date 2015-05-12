@@ -184,6 +184,14 @@ describe Distiller::Distil do
       expect(Distiller::Lock.count).to eq(0)
     end
 
+    it "doesn't allow more than one lock" do
+      old_lock = Distiller::Lock.create
+      new_lock = Distiller::Lock.create
+
+      expect(new_lock.valid?).to eq(false)
+      expect(Distiller::Lock.count).to eq(1)
+    end
+
     it "steps over pages of addresses" do
       stub_request(:get, /#{ENV['ERNEST_ADDRESS_ENDPOINT']}(\?page=[0-9]+)?/).
         to_return(body: File.read(File.join(File.dirname(__FILE__), "fixtures", "multi-page.json")),
