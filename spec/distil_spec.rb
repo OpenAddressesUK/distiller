@@ -128,6 +128,72 @@ describe Distiller::Distil do
       expect(Address.count).to eq 125
     end
 
+    it "does not create duplicates" do
+      Timecop.freeze("2014-01-01")
+
+      allow(Distiller::Distil).to receive(:current_sha).and_return("sdasdasdasd")
+
+      stub_request(:get, ENV['ERNEST_ADDRESS_ENDPOINT']).
+        to_return(body: File.read(File.join(File.dirname(__FILE__), "fixtures", "one-page.json")),
+                  headers: {"Content-Type" => "application/json"})
+
+      stub_request(:get, "#{ENV['ERNEST_ADDRESS_ENDPOINT']}?page=1").
+        to_return(body: File.read(File.join(File.dirname(__FILE__), "fixtures", "one-page.json")),
+                  headers: {"Content-Type" => "application/json"})
+
+      thread1 = Thread.new { Distiller::Distil.perform }
+      thread1.join
+      sleep 5;
+      thread2 = Thread.new { Distiller::Distil.perform }
+      thread2.join
+
+      expect(Address.count).to eq 25
+    end
+
+    it "deletes the lock after each distilation" do
+      allow(Distiller::Distil).to receive(:current_sha).and_return("sdasdasdasd")
+
+      stub_request(:get, ENV['ERNEST_ADDRESS_ENDPOINT']).
+        to_return(body: File.read(File.join(File.dirname(__FILE__), "fixtures", "one-page.json")),
+                  headers: {"Content-Type" => "application/json"})
+
+      stub_request(:get, "#{ENV['ERNEST_ADDRESS_ENDPOINT']}?page=1").
+        to_return(body: File.read(File.join(File.dirname(__FILE__), "fixtures", "one-page.json")),
+                  headers: {"Content-Type" => "application/json"})
+
+      expect(Distiller::Lock).to receive(:create).and_call_original
+
+      Distiller::Distil.perform
+
+      expect(Distiller::Lock.count).to eq(0)
+    end
+
+    it "deletes the lock after a failed run" do
+      stub_request(:get, ENV['ERNEST_ADDRESS_ENDPOINT']).
+        to_return(body: File.read(File.join(File.dirname(__FILE__), "fixtures", "one-page.json")),
+                  headers: {"Content-Type" => "application/json"})
+
+      stub_request(:get, "#{ENV['ERNEST_ADDRESS_ENDPOINT']}?page=1").
+        to_return(body: File.read(File.join(File.dirname(__FILE__), "fixtures", "one-page.json")),
+                  headers: {"Content-Type" => "application/json"})
+
+
+      allow(Distiller::Distil).to receive(:current_sha).and_raise(StandardError)
+
+      expect{ Distiller::Distil.perform }.to raise_error(StandardError)
+
+
+      expect(Distiller::Lock.count).to eq(0)
+    end
+
+    it "doesn't allow more than one lock" do
+      old_lock = Distiller::Lock.create
+      new_lock = Distiller::Lock.create
+
+      expect(new_lock.valid?).to eq(false)
+      expect(Distiller::Lock.count).to eq(1)
+    end
+
     it "steps over pages of addresses" do
       stub_request(:get, /#{ENV['ERNEST_ADDRESS_ENDPOINT']}(\?page=[0-9]+)?/).
         to_return(body: File.read(File.join(File.dirname(__FILE__), "fixtures", "multi-page.json")),

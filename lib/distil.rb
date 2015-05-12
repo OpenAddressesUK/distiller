@@ -1,20 +1,48 @@
 module Distiller
+  class Lock
+    include Mongoid::Document
+
+    validates_uniqueness_of :name
+
+    field :name, default: "lock"
+  end
+
   class Distil
 
     extend Distiller::Helpers
 
     def self.perform(pages = nil, start_index = 1, step = 1, date_time = nil)
-      url = create_url(date_time)
-      pages = get_pages(url, pages)
+      # Check if lock exists
+      unless lock_exists?
+        create_lock
+        begin
+          url = create_url(date_time)
+          pages = get_pages(url, pages)
 
-      start_index.step(pages, step) do |i|
-        url.query_values = (url.query_values || {}).merge({"page" => i})
-        response = request_with_retries(url.to_s)
+          start_index.step(pages, step) do |i|
+            url.query_values = (url.query_values || {}).merge({"page" => i})
+            response = request_with_retries(url.to_s)
 
-        response['addresses'].each do |address|
-          create_address(address)
+            response['addresses'].each do |address|
+              create_address(address)
+            end
+          end
+        ensure
+          delete_lock
         end
       end
+    end
+
+    def self.create_lock
+      Lock.create
+    end
+
+    def self.delete_lock
+      Lock.delete_all
+    end
+
+    def self.lock_exists?
+      Lock.count >= 1
     end
 
     def self.create_address(address)
