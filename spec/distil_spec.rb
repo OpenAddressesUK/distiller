@@ -166,6 +166,24 @@ describe Distiller::Distil do
       expect(Distiller::Lock.count).to eq(0)
     end
 
+    it "deletes the lock after a failed run" do
+      stub_request(:get, ENV['ERNEST_ADDRESS_ENDPOINT']).
+        to_return(body: File.read(File.join(File.dirname(__FILE__), "fixtures", "one-page.json")),
+                  headers: {"Content-Type" => "application/json"})
+
+      stub_request(:get, "#{ENV['ERNEST_ADDRESS_ENDPOINT']}?page=1").
+        to_return(body: File.read(File.join(File.dirname(__FILE__), "fixtures", "one-page.json")),
+                  headers: {"Content-Type" => "application/json"})
+
+
+      allow(Distiller::Distil).to receive(:current_sha).and_raise(StandardError)
+
+      expect{ Distiller::Distil.perform }.to raise_error(StandardError)
+
+
+      expect(Distiller::Lock.count).to eq(0)
+    end
+
     it "steps over pages of addresses" do
       stub_request(:get, /#{ENV['ERNEST_ADDRESS_ENDPOINT']}(\?page=[0-9]+)?/).
         to_return(body: File.read(File.join(File.dirname(__FILE__), "fixtures", "multi-page.json")),
