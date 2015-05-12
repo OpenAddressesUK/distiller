@@ -141,13 +141,9 @@ describe Distiller::Distil do
         to_return(body: File.read(File.join(File.dirname(__FILE__), "fixtures", "one-page.json")),
                   headers: {"Content-Type" => "application/json"})
 
-      threads = []
-
-      2.times do
-        threads << Thread.new { Distiller::Distil.perform }
-      end
-
-      threads.each { |thr| thr.join }
+      Thread.new { Distiller::Distil.perform }
+      sleep 5;
+      Thread.new { Distiller::Distil.perform }
 
       expect(Address.count).to eq 25
     end
