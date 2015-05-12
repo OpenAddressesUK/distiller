@@ -70,6 +70,23 @@ module Distiller
 
       if a.valid?
         puts "Address #{a.full_address} created"
+      else
+        if address['uprn'] && address['uprn']['name'] != nil
+          existing_address = Address.where(full_address: a.full_address).first
+          existing_address.uprn = address['uprn']['name']
+          existing_address.provenance["activity"]["executed_at"] = DateTime.now
+          existing_address.provenance["activity"]["derived_from"] << {
+            type: "Source",
+            urls: [
+              address["url"]
+            ],
+            downloaded_at: DateTime.now,
+            processing_script: "https://github.com/OpenAddressesUK/distiller/tree/#{current_sha}/lib/distil.rb"
+          }
+
+          existing_address.save
+          puts "Address #{existing_address.full_address} updated with uprn #{existing_address.uprn}"
+        end
       end
     end
 
