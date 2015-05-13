@@ -46,34 +46,40 @@ module Distiller
     end
 
     def self.create_address(address)
-      postcode = get_postcode(address)
-      street = get_street(address)
-      locality = get_locality(address, postcode)
-      town = get_town(address)
-
-      a = Address.create(
-        sao: address['saon']['name'],
-        pao: address['paon']['name'],
-        street: street,
-        locality: locality,
-        town: town,
-        postcode: postcode,
-        provenance: {
-          activity: {
-            executed_at: DateTime.now,
-            processing_scripts: "https://github.com/OpenAddressesUK/distiller",
-            derived_from: derivations(address, [postcode, street, locality, town])
-          }
-        },
-        source: address['provenance']['activity']['derived_from'].first['type']
-      )
-
-      if a.valid?
-        puts "Address #{a.full_address} created"
+      if address['uri'] && address['uri']['name'] != nil
+        token = address['uri']['name'].split("/").last
+        a = Address.find(token)
+        update_uprn(a, address['uprn']['name'], address['url']) if !a.nil?
       else
-        if address['uprn'] && address['uprn']['name'] != nil
-          a = Address.where(full_address: a.full_address).first
-          update_uprn(a, address['uprn']['name'], address['url'])
+        postcode = get_postcode(address)
+        street = get_street(address)
+        locality = get_locality(address, postcode)
+        town = get_town(address)
+
+        a = Address.create(
+          sao: address['saon']['name'],
+          pao: address['paon']['name'],
+          street: street,
+          locality: locality,
+          town: town,
+          postcode: postcode,
+          provenance: {
+            activity: {
+              executed_at: DateTime.now,
+              processing_scripts: "https://github.com/OpenAddressesUK/distiller",
+              derived_from: derivations(address, [postcode, street, locality, town])
+            }
+          },
+          source: address['provenance']['activity']['derived_from'].first['type']
+        )
+
+        if a.valid?
+          puts "Address #{a.full_address} created"
+        else
+          if address['uprn'] && address['uprn']['name'] != nil
+            a = Address.where(full_address: a.full_address).first
+            update_uprn(a, address['uprn']['name'], address['url'])
+          end
         end
       end
     end
