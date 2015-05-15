@@ -46,48 +46,58 @@ module Distiller
     end
 
     def self.create_address(address)
-      postcode = get_postcode(address)
-      street = get_street(address)
-      locality = get_locality(address, postcode)
-      town = get_town(address)
-
-      a = Address.create(
-        sao: address['saon']['name'],
-        pao: address['paon']['name'],
-        street: street,
-        locality: locality,
-        town: town,
-        postcode: postcode,
-        provenance: {
-          activity: {
-            executed_at: DateTime.now,
-            processing_scripts: "https://github.com/OpenAddressesUK/distiller",
-            derived_from: derivations(address, [postcode, street, locality, town])
-          }
-        },
-        source: address['provenance']['activity']['derived_from'].first['type']
-      )
-
-      if a.valid?
-        puts "Address #{a.full_address} created"
+      if address['uri'] && address['uri']['name'] != nil
+        token = address['uri']['name'].split("/").last
+        a = Address.find(token)
+        update_uprn(a, address['uprn']['name'], address['url']) if !a.nil?
       else
-        if address['uprn'] && address['uprn']['name'] != nil
-          existing_address = Address.where(full_address: a.full_address).first
-          existing_address.uprn = address['uprn']['name']
-          existing_address.provenance["activity"]["executed_at"] = DateTime.now
-          existing_address.provenance["activity"]["derived_from"] << {
-            type: "Source",
-            urls: [
-              address["url"]
-            ],
-            downloaded_at: DateTime.now,
-            processing_script: "https://github.com/OpenAddressesUK/distiller/tree/#{current_sha}/lib/distil.rb"
-          }
+        postcode = get_postcode(address)
+        street = get_street(address)
+        locality = get_locality(address, postcode)
+        town = get_town(address)
 
-          existing_address.save
-          puts "Address #{existing_address.full_address} updated with uprn #{existing_address.uprn}"
+        a = Address.create(
+          sao: address['saon']['name'],
+          pao: address['paon']['name'],
+          street: street,
+          locality: locality,
+          town: town,
+          postcode: postcode,
+          provenance: {
+            activity: {
+              executed_at: DateTime.now,
+              processing_scripts: "https://github.com/OpenAddressesUK/distiller",
+              derived_from: derivations(address, [postcode, street, locality, town])
+            }
+          },
+          source: address['provenance']['activity']['derived_from'].first['type']
+        )
+
+        if a.valid?
+          puts "Address #{a.full_address} created"
+        else
+          if address['uprn'] && address['uprn']['name'] != nil
+            a = Address.where(full_address: a.full_address).first
+            update_uprn(a, address['uprn']['name'], address['url'])
+          end
         end
       end
+    end
+
+    def self.update_uprn(address, uprn, url)
+      address.uprn = uprn
+      address.provenance["activity"]["executed_at"] = DateTime.now
+      address.provenance["activity"]["derived_from"] << {
+        type: "Source",
+        urls: [
+          url
+        ],
+        downloaded_at: DateTime.now,
+        processing_script: "https://github.com/OpenAddressesUK/distiller/tree/#{current_sha}/lib/distil.rb"
+      }
+
+      address.save
+      puts "Address #{address.full_address} updated with uprn #{address.uprn}"
     end
 
     def self.from_date(date_time = nil)
